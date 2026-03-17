@@ -257,6 +257,10 @@ dd { color: #2d3748; }
 .pagination-wrapper { margin-top: 20px; }
 .pagination-wrapper nav { display: flex; justify-content: center; }
 
+/* Log link */
+.log-link { color: #667eea; font-family: monospace; font-size: .8rem; text-decoration: none; }
+.log-link:hover { text-decoration: underline; }
+
 /* Utilities */
 .text-center { text-align: center; }
 .text-muted { color: #a0aec0; }

@@ -37,6 +37,7 @@
                 <th>#</th>
                 <th>Ad Soyad</th>
                 <th>Telefon</th>
+                <th>Link</th>
                 <th>SMS Göndərildi</th>
                 <th>Status</th>
                 <th></th>
@@ -48,6 +49,12 @@
                 <td>{{ $log->id }}</td>
                 <td>{{ $log->name }} {{ $log->surname }}</td>
                 <td>{{ $log->phone }}</td>
+                <td>
+                    @php $recordUrl = url('/record/' . $log->token) @endphp
+                    <a href="{{ $recordUrl }}" target="_blank" class="log-link" title="{{ $recordUrl }}">
+                        {{ Str::limit($log->token, 16) }}…
+                    </a>
+                </td>
                 <td>{{ $log->sms_sent_at->format('d.m.Y H:i:s') }}</td>
                 <td>
                     <span class="badge badge-{{ $log->status }}">
@@ -63,7 +70,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="text-center text-muted" style="padding:32px">SMS tapılmadı</td>
+                <td colspan="7" class="text-center text-muted" style="padding:32px">SMS tapılmadı</td>
             </tr>
             @endforelse
         </tbody>

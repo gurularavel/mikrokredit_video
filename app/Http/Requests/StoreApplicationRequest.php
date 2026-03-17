@@ -16,7 +16,7 @@ class StoreApplicationRequest extends FormRequest
         return [
             'name'    => ['required', 'string', 'max:100'],
             'surname' => ['required', 'string', 'max:100'],
-            'phone'   => ['required', 'string', 'max:20', 'regex:/^\+?[0-9\s\-\(\)]{7,20}$/'],
+            'phone'   => ['required', 'string', 'regex:/^\+994[0-9]{9}$/'],
         ];
     }
 
@@ -26,7 +26,7 @@ class StoreApplicationRequest extends FormRequest
             'name.required'    => 'Ad daxil edin.',
             'surname.required' => 'Soyad daxil edin.',
             'phone.required'   => 'Telefon nömrəsi daxil edin.',
-            'phone.regex'      => 'Telefon nömrəsi düzgün formatda deyil.',
+            'phone.regex'      => 'Telefon nömrəsi +994XXXXXXXXX formatında olmalıdır (məs: +994557038008).',
         ];
     }
 }

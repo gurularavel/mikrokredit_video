@@ -9,26 +9,58 @@
 
 <div class="filter-form-card">
     <form method="GET" action="{{ route('admin.sms-logs.index') }}">
-        <div class="form-row">
+        <div class="filter-row">
             <div class="form-group">
                 <label>Telefon</label>
-                <input type="text" name="phone" value="{{ request('phone') }}" placeholder="+994...">
+                <input type="text" id="filter_phone" name="phone" value="{{ request('phone') }}" placeholder="+994..." maxlength="13" autocomplete="off">
             </div>
             <div class="form-group">
-                <label>Tarixdən</label>
-                <input type="date" name="date_from" value="{{ request('date_from') }}">
+                <label>Başlanğıc tarix</label>
+                <input type="text" name="date_from" id="sms_date_from" value="{{ request('date_from') }}" placeholder="gg.aa.iiii" autocomplete="off" readonly>
             </div>
             <div class="form-group">
-                <label>Tarixə</label>
-                <input type="date" name="date_to" value="{{ request('date_to') }}">
+                <label>Son tarix</label>
+                <input type="text" name="date_to" id="sms_date_to" value="{{ request('date_to') }}" placeholder="gg.aa.iiii" autocomplete="off" readonly>
             </div>
-            <div class="form-group" style="display:flex;align-items:flex-end;gap:8px">
-                <button type="submit" class="btn btn-primary btn-sm">Axtar</button>
-                <a href="{{ route('admin.sms-logs.index') }}" class="btn btn-secondary btn-sm">Sıfırla</a>
+            <div class="form-group filter-btns">
+                <button type="submit" class="btn btn-primary">Axtar</button>
+                <a href="{{ route('admin.sms-logs.index') }}" class="btn btn-secondary">Sıfırla</a>
             </div>
         </div>
     </form>
 </div>
+
+@push('scripts')
+<script>
+flatpickr.localize(flatpickr.l10ns.az);
+var fpCfg = { dateFormat: 'Y-m-d', altInput: true, altFormat: 'd.m.Y', allowInput: false };
+flatpickr('#sms_date_from', fpCfg);
+flatpickr('#sms_date_to',   fpCfg);
+
+(function () {
+    var PREFIX = '+994';
+    var input = document.getElementById('filter_phone');
+    if (!input) return;
+    input.addEventListener('focus', function () {
+        if (!this.value.startsWith(PREFIX)) this.value = PREFIX;
+        var len = this.value.length;
+        this.setSelectionRange(len, len);
+    });
+    input.addEventListener('input', function () {
+        var val = this.value;
+        if (!val.startsWith(PREFIX)) {
+            val = PREFIX + val.replace(/\D/g, '').replace(/^994/, '');
+        }
+        this.value = PREFIX + val.slice(PREFIX.length).replace(/\D/g, '').slice(0, 9);
+    });
+    input.addEventListener('keydown', function (e) {
+        if (this.selectionStart <= PREFIX.length && (e.key === 'Backspace' || e.key === 'Delete')) {
+            e.preventDefault();
+        }
+    });
+})();
+</script>
+@endpush
 
 <div class="table-card">
     <table class="data-table">

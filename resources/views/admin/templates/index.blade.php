@@ -69,31 +69,31 @@
 <style>
 .tabs-wrapper { display:flex; gap:4px; margin-bottom:20px; }
 .tab-btn {
-    padding:8px 24px; border:1.5px solid #E2E8F0; background:#F8FAFC;
+    padding:8px 24px; border:1.5px solid var(--color-border); background:var(--color-card);
     border-radius:8px 8px 0 0; font-size:.875rem; font-weight:600;
-    cursor:pointer; color:#475569; transition:all .15s;
-    font-family:'Inter', -apple-system, sans-serif;
+    cursor:pointer; color:var(--color-text-secondary); transition:all .15s;
+    font-family:var(--font);
 }
-.tab-btn.active { background:#1560BD; color:#fff; border-color:#1560BD; box-shadow:0 2px 8px rgba(21,96,189,.3); }
+.tab-btn.active { background:var(--color-primary); color:#fff; border-color:var(--color-primary); box-shadow:0 2px 8px rgba(21,96,189,.3); }
 .template-card { margin-bottom:16px; }
 .template-header { margin-bottom:12px; }
-.template-header h3 { font-size:.9375rem; font-weight:600; color:#0F172A; margin-bottom:6px; }
+.template-header h3 { font-size:.9375rem; font-weight:600; color:var(--color-text); margin-bottom:6px; }
 .placeholder-list { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
-.placeholder-hint { font-size:.75rem; color:#94A3B8; font-weight:500; text-transform:uppercase; letter-spacing:.04em; }
+.placeholder-hint { font-size:.75rem; color:var(--color-text-muted); font-weight:500; text-transform:uppercase; letter-spacing:.04em; }
 .placeholder-tag {
-    background:#EBF3FF; color:#1560BD; border:1px solid #93C5FD;
+    background:var(--color-primary-ultra); color:var(--color-primary); border:1px solid var(--color-primary-light);
     border-radius:4px; padding:2px 8px; font-size:.79rem; font-weight:600;
     cursor:pointer; transition:all .15s; font-family:inherit;
 }
-.placeholder-tag:hover { background:#D2E4FA; border-color:#1560BD; }
+.placeholder-tag:hover { background:var(--color-primary-light); border-color:var(--color-primary); }
 .template-textarea {
     width:100%; padding:10px 13px;
-    border:1.5px solid #E2E8F0; border-radius:8px;
-    font-size:.9375rem; font-family:'Inter', -apple-system, sans-serif;
+    border:1.5px solid var(--color-border); border-radius:8px;
+    font-size:.9375rem; font-family:var(--font);
     resize:vertical; transition:border-color .2s, box-shadow .2s; line-height:1.6;
-    background:#FAFCFF; color:#0F172A;
+    background:var(--color-card); color:var(--color-text);
 }
-.template-textarea:focus { outline:none; border-color:#1560BD; box-shadow:0 0 0 3px rgba(21,96,189,.12); }
+.template-textarea:focus { outline:none; border-color:var(--color-primary); box-shadow:0 0 0 3px rgba(21,96,189,.12); }
 </style>
 
 <script>

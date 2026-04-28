@@ -31,12 +31,14 @@ class Application extends Model
         'video_size',
         'video_recorded_at',
         'sms_sent_at',
+        'link_opened_at',
     ];
 
     protected $casts = [
         'token_expires_at'  => 'datetime',
         'video_recorded_at' => 'datetime',
         'sms_sent_at'       => 'datetime',
+        'link_opened_at'    => 'datetime',
     ];
 
     public function merchant(): BelongsTo

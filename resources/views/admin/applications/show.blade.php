@@ -17,6 +17,7 @@
             <dt>Telefon</dt><dd>{{ $application->phone }}</dd>
             <dt>Müraciət tarixi</dt><dd>{{ $application->created_at->format('d.m.Y H:i') }}</dd>
             <dt>SMS göndərildi</dt><dd>{{ $application->sms_sent_at ? $application->sms_sent_at->format('d.m.Y H:i') : '—' }}</dd>
+            <dt>Link açıldı</dt><dd>{{ $application->link_opened_at ? $application->link_opened_at->format('d.m.Y H:i:s') : '—' }}</dd>
             <dt>SMS linki</dt>
             <dd>
                 <div class="sms-link-row">

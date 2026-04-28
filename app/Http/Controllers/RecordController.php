@@ -25,6 +25,10 @@ class RecordController extends Controller
             return view('public.error', ['reason' => 'used']);
         }
 
+        if (!$application->link_opened_at) {
+            $application->update(['link_opened_at' => now()]);
+        }
+
         return view('public.record', [
             'application' => $application,
             'duration'    => config('video.duration', 15),

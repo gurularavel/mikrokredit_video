@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('applications', function (Blueprint $table) {
             $table->string('token', 120)->change();
-            // merchant_id already exists (partial run) — add FK constraint only
+            $table->unsignedBigInteger('merchant_id')->nullable()->after('id');
             $table->foreign('merchant_id')->references('id')->on('merchants')->nullOnDelete();
             $table->string('app_id')->nullable()->after('merchant_id');
             $table->decimal('amount', 12, 2)->nullable()->after('phone');

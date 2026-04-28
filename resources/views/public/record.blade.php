@@ -179,5 +179,5 @@
 @endpush
 
 @push('scripts')
-<script src="{{ asset('js/recorder.js') }}"></script>
+<script src="{{ asset('js/recorder.js') }}?v={{ filemtime(public_path('js/recorder.js')) }}"></script>
 @endpush

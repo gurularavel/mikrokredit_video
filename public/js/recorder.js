@@ -174,7 +174,7 @@
 
         mediaRecorder.start(1000);
         startCountdown();
-        startTeleprompter();
+        setTimeout(startTeleprompter, 3000);
     }
 
     function stopStream() {

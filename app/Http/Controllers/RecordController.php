@@ -84,4 +84,15 @@ class RecordController extends Controller
 
         return view('public.complete', ['application' => $application]);
     }
+
+    public function showVideo(string $accessToken)
+    {
+        $application = Application::where('access_token', $accessToken)->first();
+
+        if (!$application || !$application->video_path) {
+            abort(404);
+        }
+
+        return view('public.video', ['application' => $application]);
+    }
 }

@@ -16,13 +16,21 @@
         <p>Kamera avtomatik başlayacaq. Aşağıdakı mətni oxuyun:</p>
     </div>
 
+    @if($application->amount)
+    <div class="amount-badge">
+        <span class="amount-label">Kredit məbləği:</span>
+        <span class="amount-value">{{ number_format($application->amount, 2, '.', ' ') }} AZN</span>
+    </div>
+    @endif
+
     <div class="script-box">
         <p>{!! nl2br(e(\App\Services\TemplateService::render('page_record_script', [
             'ad'       => $application->name,
             'soyad'    => $application->surname,
             'ad_soyad' => $application->name . ' ' . $application->surname,
             'telefon'  => $application->phone,
-        ], 'Mən, ' . $application->name . ' ' . $application->surname . ', bu video ilə kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: ' . $application->phone . '. Bu müraciəti şüurlu şəkildə edirəm.'))) !!}</p>
+            'mebleg'   => $application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN' : '',
+        ], 'Mən, ' . $application->name . ' ' . $application->surname . ', ' . ($application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN məbləğində ' : '') . 'kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: ' . $application->phone . '. Bu müraciəti şüurlu şəkildə edirəm.'))) !!}</p>
     </div>
 
     <!-- Start button -->
@@ -60,6 +68,31 @@
     <div class="status-msg" id="status-msg"></div>
 </div>
 @endsection
+
+@push('head')
+<style>
+.amount-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--color-card, #fff);
+    border: 1.5px solid var(--color-border, #e2e8f0);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 14px;
+    font-size: 1rem;
+}
+.amount-label {
+    color: var(--color-text-secondary, #64748b);
+    font-weight: 500;
+}
+.amount-value {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--color-primary, #2563eb);
+}
+</style>
+@endpush
 
 @push('scripts')
 <script src="{{ asset('js/recorder.js') }}"></script>

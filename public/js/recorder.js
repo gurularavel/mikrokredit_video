@@ -2,34 +2,74 @@
     const app = document.getElementById('record-app');
     if (!app) return;
 
-    const DURATION = parseInt(app.dataset.duration, 10) || 20;
+    const DURATION   = parseInt(app.dataset.duration, 10) || 20;
     const UPLOAD_URL = app.dataset.uploadUrl;
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
+    const EARLY_SHOW = 10; // saniyə qaldıqda düymələri göstər
 
-    const liveVideo = document.getElementById('live-video');
-    const previewVideo = document.getElementById('preview-video');
-    const timerNumber = document.getElementById('timer-number');
-    const timerRingProgress = document.getElementById('timer-ring-progress');
-    const cameraContainer = document.getElementById('camera-container');
-    const previewContainer = document.getElementById('preview-container');
-    const uploadOverlay = document.getElementById('upload-overlay');
-    const statusMsg = document.getElementById('status-msg');
-    const confirmBtn = document.getElementById('confirm-btn');
-    const rerecordBtn = document.getElementById('rerecord-btn');
-    const startScreen = document.getElementById('start-screen');
-    const startBtn = document.getElementById('start-btn');
+    const liveVideo          = document.getElementById('live-video');
+    const previewVideo       = document.getElementById('preview-video');
+    const timerNumber        = document.getElementById('timer-number');
+    const timerRingProgress  = document.getElementById('timer-ring-progress');
+    const cameraContainer    = document.getElementById('camera-container');
+    const previewContainer   = document.getElementById('preview-container');
+    const uploadOverlay      = document.getElementById('upload-overlay');
+    const statusMsg          = document.getElementById('status-msg');
+    const confirmBtn         = document.getElementById('confirm-btn');
+    const rerecordBtn        = document.getElementById('rerecord-btn');
+    const startScreen        = document.getElementById('start-screen');
+    const startBtn           = document.getElementById('start-btn');
+    const earlyActions       = document.getElementById('early-actions');
+    const earlyConfirmBtn    = document.getElementById('early-confirm-btn');
+    const earlyRerecordBtn   = document.getElementById('early-rerecord-btn');
+    const teleprompterInner  = document.getElementById('teleprompter-inner');
 
-    const CIRCUMFERENCE = 2 * Math.PI * 54; // r=54
-    timerRingProgress.style.strokeDasharray = CIRCUMFERENCE;
+    const CIRCUMFERENCE = 2 * Math.PI * 54;
+    timerRingProgress.style.strokeDasharray  = CIRCUMFERENCE;
     timerRingProgress.style.strokeDashoffset = 0;
 
-    let mediaStream = null;
-    let mediaRecorder = null;
-    let chunks = [];
-    let recordedBlob = null;
+    let mediaStream      = null;
+    let mediaRecorder    = null;
+    let chunks           = [];
+    let recordedBlob     = null;
     let countdownInterval = null;
-    let timeLeft = DURATION;
+    let timeLeft         = DURATION;
+    let autoSend         = false;
+    let rafId            = null;
 
+    // ── Suflyör sürüşməsi ──────────────────────────────────────────────────
+    function startTeleprompter() {
+        if (!teleprompterInner) return;
+        const innerH    = teleprompterInner.scrollHeight;
+        const totalMs   = DURATION * 1000 * 1.05; // recording müddətindən bir az uzun
+        const startTime = performance.now();
+
+        function step(now) {
+            const elapsed  = now - startTime;
+            const progress = Math.min(elapsed / totalMs, 1);
+            teleprompterInner.style.transform = `translateY(-${progress * innerH}px)`;
+            if (progress < 1) {
+                rafId = requestAnimationFrame(step);
+            }
+        }
+        rafId = requestAnimationFrame(step);
+    }
+
+    function stopTeleprompter() {
+        if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+    }
+
+    function resetTeleprompter() {
+        stopTeleprompter();
+        if (teleprompterInner) {
+            teleprompterInner.style.transform = 'translateY(0)';
+        }
+    }
+
+    // ── MIME type ──────────────────────────────────────────────────────────
     function getMimeType() {
         const types = [
             'video/webm;codecs=vp8,opus',
@@ -43,6 +83,7 @@
         return '';
     }
 
+    // ── Geri sayım ────────────────────────────────────────────────────────
     function startCountdown() {
         timeLeft = DURATION;
         timerNumber.textContent = timeLeft;
@@ -54,6 +95,10 @@
             const offset = CIRCUMFERENCE * (1 - timeLeft / DURATION);
             timerRingProgress.style.strokeDashoffset = offset;
 
+            if (timeLeft <= EARLY_SHOW && earlyActions.style.display === 'none') {
+                earlyActions.style.display = 'flex';
+            }
+
             if (timeLeft <= 0) {
                 clearInterval(countdownInterval);
                 if (mediaRecorder && mediaRecorder.state === 'recording') {
@@ -63,30 +108,73 @@
         }, 1000);
     }
 
+    // ── Yükləmə ───────────────────────────────────────────────────────────
+    async function uploadBlob() {
+        uploadOverlay.style.display = 'flex';
+        statusMsg.textContent = '';
+
+        const formData = new FormData();
+        const ext = recordedBlob.type.includes('mp4') ? 'mp4' : 'webm';
+        formData.append('video', recordedBlob, 'recording.' + ext);
+        formData.append('mime_type', recordedBlob.type);
+        formData.append('_token', CSRF_TOKEN);
+
+        try {
+            const response = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+            const data = await response.json();
+            if (data.success) {
+                stopStream();
+                window.location.href = data.redirect;
+            } else {
+                uploadOverlay.style.display = 'none';
+                statusMsg.textContent = data.message || 'Xəta baş verdi. Yenidən cəhd edin.';
+                confirmBtn.disabled   = false;
+                rerecordBtn.disabled  = false;
+            }
+        } catch (err) {
+            uploadOverlay.style.display = 'none';
+            statusMsg.textContent = 'Şəbəkə xətası: ' + err.message;
+            confirmBtn.disabled   = false;
+            rerecordBtn.disabled  = false;
+        }
+    }
+
+    // ── Qeydiyyat ─────────────────────────────────────────────────────────
     function startRecording(stream) {
         mediaStream = stream;
         liveVideo.srcObject = stream;
         chunks = [];
+        autoSend = false;
+        earlyActions.style.display = 'none';
 
         const mimeType = getMimeType();
-        const options = mimeType ? { mimeType } : {};
-        mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
 
         mediaRecorder.ondataavailable = (e) => {
             if (e.data && e.data.size > 0) chunks.push(e.data);
         };
 
         mediaRecorder.onstop = () => {
+            clearInterval(countdownInterval);
+            stopTeleprompter();
             const mimeUsed = mediaRecorder.mimeType || 'video/webm';
             recordedBlob = new Blob(chunks, { type: mimeUsed });
+
+            if (autoSend) {
+                uploadBlob();
+                return;
+            }
+
             const url = URL.createObjectURL(recordedBlob);
             previewVideo.src = url;
+            earlyActions.style.display    = 'none';
             cameraContainer.style.display = 'none';
             previewContainer.style.display = 'block';
         };
 
         mediaRecorder.start(1000);
         startCountdown();
+        startTeleprompter();
     }
 
     function stopStream() {
@@ -96,10 +184,17 @@
         }
     }
 
+    function stopRecording() {
+        clearInterval(countdownInterval);
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
+    }
+
     async function initCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            startScreen.style.display = 'none';
+            startScreen.style.display     = 'none';
             cameraContainer.style.display = 'block';
             startRecording(stream);
         } catch (err) {
@@ -109,60 +204,51 @@
         }
     }
 
+    // ── Hadisələr ─────────────────────────────────────────────────────────
     startBtn.addEventListener('click', () => {
-        startBtn.disabled = true;
+        startBtn.disabled    = true;
         startBtn.textContent = 'Kamera açılır...';
         initCamera();
     });
 
+    // Erkən "Göndər"
+    earlyConfirmBtn.addEventListener('click', () => {
+        autoSend = true;
+        earlyActions.style.display = 'none';
+        stopRecording();
+    });
+
+    // Erkən "Yenidən çək"
+    earlyRerecordBtn.addEventListener('click', () => {
+        stopRecording();
+        stopStream();
+        resetTeleprompter();
+        earlyActions.style.display    = 'none';
+        cameraContainer.style.display = 'none';
+        startScreen.style.display     = 'block';
+        startBtn.disabled    = false;
+        startBtn.textContent = '▶ Başla';
+    });
+
+    // Preview "Yenidən çək"
     rerecordBtn.addEventListener('click', () => {
         previewContainer.style.display = 'none';
-        cameraContainer.style.display = 'block';
         if (previewVideo.src) {
             URL.revokeObjectURL(previewVideo.src);
             previewVideo.src = '';
         }
         recordedBlob = null;
+        resetTeleprompter();
         initCamera();
+        cameraContainer.style.display = 'block';
     });
 
-    confirmBtn.addEventListener('click', async () => {
+    // Preview "Göndər"
+    confirmBtn.addEventListener('click', () => {
         if (!recordedBlob) return;
-
-        uploadOverlay.style.display = 'flex';
-        statusMsg.textContent = '';
-        confirmBtn.disabled = true;
+        confirmBtn.disabled  = true;
         rerecordBtn.disabled = true;
-
-        const formData = new FormData();
-        const ext = recordedBlob.type.includes('mp4') ? 'mp4' : 'webm';
-        formData.append('video', recordedBlob, 'recording.' + ext);
-        formData.append('mime_type', recordedBlob.type);
-        formData.append('_token', CSRF_TOKEN);
-
-        try {
-            const response = await fetch(UPLOAD_URL, {
-                method: 'POST',
-                body: formData,
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                stopStream();
-                window.location.href = data.redirect;
-            } else {
-                uploadOverlay.style.display = 'none';
-                statusMsg.textContent = data.message || 'Xəta baş verdi. Yenidən cəhd edin.';
-                confirmBtn.disabled = false;
-                rerecordBtn.disabled = false;
-            }
-        } catch (err) {
-            uploadOverlay.style.display = 'none';
-            statusMsg.textContent = 'Şəbəkə xətası: ' + err.message;
-            confirmBtn.disabled = false;
-            rerecordBtn.disabled = false;
-        }
+        uploadBlob();
     });
 
 })();

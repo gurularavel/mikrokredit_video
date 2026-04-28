@@ -23,14 +23,18 @@
     </div>
     @endif
 
-    <div class="script-box">
-        <p>{!! nl2br(e(\App\Services\TemplateService::render('page_record_script', [
-            'ad'       => $application->name,
-            'soyad'    => $application->surname,
-            'ad_soyad' => $application->name . ' ' . $application->surname,
-            'telefon'  => $application->phone,
-            'mebleg'   => $application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN' : '',
-        ], 'Mən, ' . $application->name . ' ' . $application->surname . ', ' . ($application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN məbləğində ' : '') . 'kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: ' . $application->phone . '. Bu müraciəti şüurlu şəkildə edirəm.'))) !!}</p>
+    <div class="teleprompter" id="teleprompter">
+        <div class="teleprompter-fade teleprompter-fade-top"></div>
+        <div class="teleprompter-inner" id="teleprompter-inner">
+            <p>{!! nl2br(e(\App\Services\TemplateService::render('page_record_script', [
+                'ad'       => $application->name,
+                'soyad'    => $application->surname,
+                'ad_soyad' => $application->name . ' ' . $application->surname,
+                'telefon'  => $application->phone,
+                'mebleg'   => $application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN' : '',
+            ], 'Mən, ' . $application->name . ' ' . $application->surname . ', ' . ($application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN məbləğində ' : '') . 'kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: ' . $application->phone . '. Bu müraciəti şüurlu şəkildə edirəm.'))) !!}</p>
+        </div>
+        <div class="teleprompter-fade teleprompter-fade-bottom"></div>
     </div>
 
     @php
@@ -58,6 +62,12 @@
             </svg>
             <span class="timer-number" id="timer-number">{{ $duration }}</span>
         </div>
+    </div>
+
+    <!-- Early action buttons (visible at 10s remaining) -->
+    <div class="early-actions" id="early-actions" style="display:none">
+        <button class="btn btn-secondary" id="early-rerecord-btn">Yenidən çək</button>
+        <button class="btn btn-primary" id="early-confirm-btn">Göndər</button>
     </div>
 
     <!-- Preview after recording -->
@@ -120,6 +130,49 @@
     height: 20px;
     margin-top: 1px;
     stroke: #ca8a04;
+}
+.teleprompter {
+    position: relative;
+    height: 130px;
+    overflow: hidden;
+    background: var(--color-card, #fff);
+    border: 1.5px solid var(--color-border, #e2e8f0);
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+.teleprompter-inner {
+    padding: 16px 20px 40px;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--color-text, #1e293b);
+    font-weight: 500;
+    will-change: transform;
+}
+.teleprompter-fade {
+    position: absolute;
+    left: 0; right: 0;
+    height: 36px;
+    pointer-events: none;
+    z-index: 2;
+}
+.teleprompter-fade-top {
+    top: 0;
+    background: linear-gradient(to bottom, var(--color-card, #fff), transparent);
+}
+.teleprompter-fade-bottom {
+    bottom: 0;
+    background: linear-gradient(to top, var(--color-card, #fff), transparent);
+}
+.early-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
+    animation: fadeInUp .4s ease;
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 </style>
 @endpush

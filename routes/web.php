@@ -7,11 +7,11 @@ use App\Http\Controllers\Admin\ApplicationController as AdminApplicationControll
 use App\Http\Controllers\Admin\SmsLogController;
 use App\Http\Controllers\Admin\TemplateController;
 use App\Http\Controllers\Admin\MerchantController;
+use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
-Route::get('/', [ApplicationController::class, 'index'])->name('applications.index');
-Route::post('/applications', [ApplicationController::class, 'store'])->name('applications.store');
+Route::get('/', fn() => redirect()->route('admin.login'));
 Route::get('/applications/sent', [ApplicationController::class, 'sent'])->name('applications.sent');
 
 // Video recording routes (token-gated)
@@ -31,6 +31,8 @@ Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.log
 Route::middleware('admin.auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', fn() => redirect()->route('admin.applications.index'));
     Route::get('/applications', [AdminApplicationController::class, 'index'])->name('applications.index');
+    Route::get('/applications/create', [AdminApplicationController::class, 'create'])->name('applications.create');
+    Route::post('/applications', [AdminApplicationController::class, 'store'])->name('applications.store');
     Route::get('/applications/{application}', [AdminApplicationController::class, 'show'])->name('applications.show');
     Route::patch('/applications/{application}/status', [AdminApplicationController::class, 'updateStatus'])->name('applications.updateStatus');
     Route::get('/sms-logs', [SmsLogController::class, 'index'])->name('sms-logs.index');
@@ -40,4 +42,6 @@ Route::middleware('admin.auth')->prefix('admin')->name('admin.')->group(function
     Route::patch('/templates/{template}', [TemplateController::class, 'update'])->name('templates.update');
     Route::resource('merchants', MerchantController::class);
     Route::post('merchants/{merchant}/generate-key', [MerchantController::class, 'generateAuthKey'])->name('merchants.generate-key');
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 });

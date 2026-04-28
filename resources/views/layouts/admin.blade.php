@@ -35,6 +35,10 @@
                 <span class="nav-icon">&#9998;</span>
                 <span class="nav-label">Mesaj Şablonları</span>
             </a>
+            <a href="{{ route('admin.settings.index') }}" class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" title="Tənzimləmələr">
+                <span class="nav-icon">&#9881;</span>
+                <span class="nav-label">Tənzimləmələr</span>
+            </a>
             <a href="{{ route('admin.password') }}" class="{{ request()->routeIs('admin.password*') ? 'active' : '' }}" title="Şifrə dəyiş">
                 <span class="nav-icon">&#128274;</span>
                 <span class="nav-label">Şifrə dəyiş</span>

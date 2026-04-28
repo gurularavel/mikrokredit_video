@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendApplicationSms;
 use App\Models\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ApplicationController extends Controller
 {
@@ -27,6 +29,49 @@ class ApplicationController extends Controller
         $applications = $query->paginate(15)->withQueryString();
 
         return view('admin.applications.index', compact('applications'));
+    }
+
+    public function create()
+    {
+        return view('admin.applications.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name'    => ['required', 'string', 'max:100'],
+            'surname' => ['required', 'string', 'max:100'],
+            'phone'   => ['required', 'string', 'regex:/^\+994[0-9]{9}$/'],
+            'amount'  => ['nullable', 'numeric', 'min:0'],
+        ], [
+            'name.required'    => 'Ad daxil edin.',
+            'surname.required' => 'Soyad daxil edin.',
+            'phone.required'   => 'Telefon nömrəsi daxil edin.',
+            'phone.regex'      => 'Telefon nömrəsi +994XXXXXXXXX formatında olmalıdır.',
+            'amount.numeric'   => 'Məbləğ rəqəm olmalıdır.',
+            'amount.min'       => 'Məbləğ mənfi ola bilməz.',
+        ]);
+
+        $expiryMinutes = (int) config('sms.expiry_minutes', 60);
+        $token         = Str::random(64);
+        $accessToken   = Str::random(64);
+
+        $application = Application::create([
+            'name'             => $validated['name'],
+            'surname'          => $validated['surname'],
+            'phone'            => $validated['phone'],
+            'amount'           => $validated['amount'] ?? null,
+            'token'            => $token,
+            'access_token'     => $accessToken,
+            'token_expires_at' => now()->addMinutes($expiryMinutes),
+            'status'           => 'pending',
+        ]);
+
+        SendApplicationSms::dispatch($application);
+
+        return redirect()
+            ->route('admin.applications.show', $application)
+            ->with('success', 'Müraciət yaradıldı və SMS göndərildi.');
     }
 
     public function show(Application $application)

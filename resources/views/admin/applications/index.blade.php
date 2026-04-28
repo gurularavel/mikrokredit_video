@@ -5,6 +5,7 @@
 @section('content')
 <div class="page-header">
     <h2>Müraciətlər</h2>
+    <a href="{{ route('admin.applications.create') }}" class="btn btn-primary btn-sm">+ Yeni Müraciət</a>
 </div>
 
 <div class="filter-form-card">

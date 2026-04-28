@@ -1,0 +1,84 @@
+name: 🚀 Deploy via SSH with Incremental Updates
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: 🔍 Get changed files
+        id: changed-files
+        run: |
+          echo "files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_OUTPUT
+      - name: 📂 Deploy using SSH
+        uses: appleboy/ssh-action@master
+        env:
+          CHANGED_FILES: ${{ steps.changed-files.outputs.files }}
+          REPO_URL: https://${{ secrets.GIT_TOKEN }}@github.com/gurularavel/videorec20.git
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USERNAME }}
+          password: ${{ secrets.REMOTE_PASSWORD }}
+          port: 222
+          envs: CHANGED_FILES,REPO_URL
+          script: |
+            cd /usr/www/users/kvadrv/projects/videorec
+
+            # Remove existing git directory if it exists
+            rm -rf .git
+
+            # Create fresh git directory
+            git init
+            git config --local user.email "github-actions@github.com"
+            git config --local user.name "GitHub Actions"
+
+            # Add remote with embedded token
+            git remote add origin "$REPO_URL"
+
+            # Create deployment directory
+            mkdir -p .deployment
+            echo "none" > .deployment/last_commit
+
+            # Fetch only the main branch
+            git fetch origin main:main
+
+            LAST_COMMIT=$(cat .deployment/last_commit)
+
+            if [ "$LAST_COMMIT" != "none" ]; then
+              echo "Changed files: $CHANGED_FILES"
+              for file in $CHANGED_FILES; do
+                if [ -n "$file" ]; then
+                  echo "Updating: $file"
+                  git checkout main -- "$file"
+                  mkdir -p "$(dirname "$file")"
+                  cp -f "$file" "$file"
+                fi
+              done
+            else
+              git checkout main -f
+              echo "Initial deployment - all files updated"
+            fi
+
+            git rev-parse main > .deployment/last_commit
+
+            # Set permissions
+            find . -type d -exec chmod 755 {} \;
+            find . -type f -exec chmod 644 {} \;
+            chmod -R 755 storage bootstrap/cache 2>/dev/null || true
+
+            # Create deployment log
+            echo "Deployment completed at $(date)" > .deployment/deploy_log.txt
+            echo "Changed files:" >> .deployment/deploy_log.txt
+            echo "$CHANGED_FILES" >> .deployment/deploy_log.txt
+
+            # Clean up by removing .git directory
+            rm -rf .git
+
+            echo "Deployment completed successfully"
+            echo "Deployment log:"
+            cat .deployment/deploy_log.txt

@@ -118,8 +118,17 @@ class MessageTemplateSeeder extends Seeder
                 'key'          => 'page_record_script',
                 'label'        => 'Video çəkiliş — oxunacaq mətn',
                 'group'        => 'page',
-                'placeholders' => ['{ad}', '{soyad}', '{ad_soyad}', '{telefon}'],
-                'content'      => 'Mən, {ad_soyad}, bu video ilə kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: {telefon}. Bu müraciəti şüurlu şəkildə edirəm.',
+                'placeholders' => ['{ad}', '{soyad}', '{ad_soyad}', '{telefon}', '{mebleg}'],
+                'content'      => 'Mən, {ad_soyad}, {mebleg} məbləğində kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: {telefon}. Bu müraciəti şüurlu şəkildə edirəm.',
+            ],
+
+            // ── Page: Video çəkiliş xəbərdarlığı ─────────────────────────
+            [
+                'key'          => 'page_record_warning',
+                'label'        => 'Video çəkiliş — xəbərdarlıq mətni',
+                'group'        => 'page',
+                'placeholders' => [],
+                'content'      => 'Video çəkilişi zamanı yanınızda kimsənin olmadığından əmin olun.',
             ],
         ];
 

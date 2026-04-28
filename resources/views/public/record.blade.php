@@ -98,8 +98,8 @@
     background: var(--color-card, #fff);
     border: 1.5px solid var(--color-border, #e2e8f0);
     border-radius: 10px;
-    padding: 12px 18px;
-    margin-bottom: 14px;
+    padding: 9px 16px;
+    margin-bottom: 8px;
     font-size: 1rem;
 }
 .amount-label {
@@ -118,8 +118,8 @@
     background: #fefce8;
     border: 1.5px solid #fde047;
     border-radius: 10px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
+    padding: 9px 14px;
+    margin-bottom: 8px;
     color: #854d0e;
     font-size: .9375rem;
     line-height: 1.5;
@@ -133,25 +133,26 @@
 }
 .teleprompter {
     position: relative;
-    height: 130px;
+    /* 2 sətir: font 1.4rem × line-height 1.75 × 2 + padding 20px */
+    height: calc(1.4rem * 1.75 * 2 + 20px);
     overflow: hidden;
     background: var(--color-card, #fff);
     border: 1.5px solid var(--color-border, #e2e8f0);
     border-radius: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
 }
 .teleprompter-inner {
-    padding: 16px 20px 40px;
-    font-size: 1.05rem;
+    padding: 10px 20px 60px;
+    font-size: 1.4rem;
     line-height: 1.75;
     color: var(--color-text, #1e293b);
-    font-weight: 500;
+    font-weight: 600;
     will-change: transform;
 }
 .teleprompter-fade {
     position: absolute;
     left: 0; right: 0;
-    height: 36px;
+    height: 28px;
     pointer-events: none;
     z-index: 2;
 }
@@ -167,7 +168,7 @@
     display: flex;
     gap: 12px;
     justify-content: center;
-    margin-top: 16px;
+    margin-top: 12px;
     animation: fadeInUp .4s ease;
 }
 @keyframes fadeInUp {

@@ -41,7 +41,7 @@
     function startTeleprompter() {
         if (!teleprompterInner) return;
         const innerH    = teleprompterInner.scrollHeight;
-        const totalMs   = DURATION * 1000 * 1.05; // recording müddətindən bir az uzun
+        const totalMs   = 15 * 1000; // 15 saniyəyə uygun sürət
         const startTime = performance.now();
 
         function step(now) {

@@ -6,7 +6,8 @@
 @php
     $ogTitle = \App\Services\SettingService::get('og_title', 'Video Müraciət');
     $ogDesc  = \App\Services\SettingService::get('og_description', 'Kredit müraciətinin video təsdiqi');
-    $ogImage = \App\Services\SettingService::get('og_image_url');
+    $ogRaw   = \App\Services\SettingService::get('og_image_url');
+    $ogImage = $ogRaw ? (str_starts_with($ogRaw, 'http') ? $ogRaw : url($ogRaw)) : null;
     $ogUrl   = request()->url();
 @endphp
 <meta property="og:type"        content="website">

@@ -35,7 +35,7 @@ class SettingController extends Controller
             }
             $path = $request->file('og_image')->store('og', 'public');
             $data['og_image_path'] = $path;
-            $data['og_image_url']  = Storage::disk('public')->url($path);
+            $data['og_image_url']  = url(Storage::disk('public')->url($path));
         } elseif ($request->filled('og_image_url')) {
             $data['og_image_url'] = $request->input('og_image_url');
         }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
 use App\Http\Controllers\Admin\SmsLogController;
 use App\Http\Controllers\Admin\TemplateController;
+use App\Http\Controllers\Admin\MerchantController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -34,4 +35,6 @@ Route::middleware('admin.auth')->prefix('admin')->name('admin.')->group(function
     Route::post('/password', [AuthController::class, 'changePassword'])->name('password.update');
     Route::get('/templates', [TemplateController::class, 'index'])->name('templates.index');
     Route::patch('/templates/{template}', [TemplateController::class, 'update'])->name('templates.update');
+    Route::resource('merchants', MerchantController::class);
+    Route::post('merchants/{merchant}/generate-key', [MerchantController::class, 'generateAuthKey'])->name('merchants.generate-key');
 });

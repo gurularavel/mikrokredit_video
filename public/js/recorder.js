@@ -2,7 +2,7 @@
     const app = document.getElementById('record-app');
     if (!app) return;
 
-    const DURATION = parseInt(app.dataset.duration, 10) || 15;
+    const DURATION = parseInt(app.dataset.duration, 10) || 20;
     const UPLOAD_URL = app.dataset.uploadUrl;
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
 

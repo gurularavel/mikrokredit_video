@@ -4,15 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
 class Application extends Model
 {
     protected $fillable = [
+        'merchant_id',
+        'app_id',
         'name',
         'surname',
         'phone',
+        'amount',
+        'webhook_url',
+        'merchant_redirect_url',
+        'lang',
+        'city',
+        'address',
+        'salary',
         'token',
+        'access_token',
         'token_expires_at',
         'status',
         'video_path',
@@ -27,6 +38,11 @@ class Application extends Model
         'video_recorded_at' => 'datetime',
         'sms_sent_at'       => 'datetime',
     ];
+
+    public function merchant(): BelongsTo
+    {
+        return $this->belongsTo(Merchant::class);
+    }
 
     public function scopeByPhone(Builder $query, string $phone): Builder
     {

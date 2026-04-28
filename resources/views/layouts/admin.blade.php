@@ -27,6 +27,10 @@
                 <span class="nav-icon">&#128241;</span>
                 <span class="nav-label">SMS Logları</span>
             </a>
+            <a href="{{ route('admin.merchants.index') }}" class="{{ request()->routeIs('admin.merchants.*') ? 'active' : '' }}" title="Merchantlər">
+                <span class="nav-icon">&#127978;</span>
+                <span class="nav-label">Merchantlər</span>
+            </a>
             <a href="{{ route('admin.templates.index') }}" class="{{ request()->routeIs('admin.templates.*') ? 'active' : '' }}" title="Mesaj Şablonları">
                 <span class="nav-icon">&#9998;</span>
                 <span class="nav-label">Mesaj Şablonları</span>

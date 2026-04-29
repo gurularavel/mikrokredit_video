@@ -15,6 +15,9 @@
             <dt>Ad</dt><dd>{{ $application->name }}</dd>
             <dt>Soyad</dt><dd>{{ $application->surname }}</dd>
             <dt>Telefon</dt><dd>{{ $application->phone }}</dd>
+            @if($application->amount)
+            <dt>Məbləğ</dt><dd>{{ number_format($application->amount, 2) }} AZN</dd>
+            @endif
             <dt>Müraciət tarixi</dt><dd>{{ $application->created_at->format('d.m.Y H:i') }}</dd>
             <dt>SMS göndərildi</dt><dd>{{ $application->sms_sent_at ? $application->sms_sent_at->format('d.m.Y H:i') : '—' }}</dd>
             <dt>Link açıldı</dt><dd>{{ $application->link_opened_at ? $application->link_opened_at->format('d.m.Y H:i:s') : '—' }}</dd>

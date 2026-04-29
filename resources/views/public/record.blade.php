@@ -87,7 +87,32 @@
 
 @push('head')
 <style>
-.public-layout .container { padding: 10px 12px; }
+/* Full-height flex chain — only record page has camera-container/record-page */
+html, body { height: 100%; }
+.public-layout { display: flex; flex-direction: column; }
+.public-layout .container {
+    padding: 10px 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+.record-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+#camera-container {
+    flex: 1;
+    min-height: 0;
+    aspect-ratio: unset;
+    max-height: none;
+}
+#preview-container {
+    flex: 1;
+    min-height: 0;
+}
 
 .amount-badge {
     display: flex;

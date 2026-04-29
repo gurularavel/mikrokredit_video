@@ -13,7 +13,7 @@
 
     <div class="record-header">
         <h1>Video Müraciət</h1>
-        <p>Kamera avtomatik başlayacaq. Aşağıdakı mətni oxuyun:</p>
+        <p>Kamera başlayacaq — aşağıdakı mətni oxuyun.</p>
     </div>
 
     @if($application->amount)
@@ -22,20 +22,6 @@
         <span class="amount-value">{{ number_format($application->amount, 2, '.', ' ') }} AZN</span>
     </div>
     @endif
-
-    <div class="teleprompter" id="teleprompter">
-        <div class="teleprompter-fade teleprompter-fade-top"></div>
-        <div class="teleprompter-inner" id="teleprompter-inner">
-            <p>{!! nl2br(e(\App\Services\TemplateService::render('page_record_script', [
-                'ad'       => $application->name,
-                'soyad'    => $application->surname,
-                'ad_soyad' => $application->name . ' ' . $application->surname,
-                'telefon'  => $application->phone,
-                'mebleg'   => $application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN' : '',
-            ], 'Mən, ' . $application->name . ' ' . $application->surname . ', ' . ($application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN məbləğində ' : '') . 'kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: ' . $application->phone . '. Bu müraciəti şüurlu şəkildə edirəm.'))) !!}</p>
-        </div>
-        <div class="teleprompter-fade teleprompter-fade-bottom"></div>
-    </div>
 
     @php
         $warningText = \App\Services\TemplateService::render('page_record_warning', [], 'Video çəkilişi zamanı yanınızda kimsənin olmadığından əmin olun.');
@@ -47,20 +33,34 @@
     </div>
     @endif
 
-    <!-- Start button -->
-    <div id="start-screen" class="start-screen">
-        <button id="start-btn" class="btn btn-primary btn-start">&#9654; Başla</button>
-    </div>
+    <!-- Camera area — always visible -->
+    <div class="camera-container" id="camera-container">
+        <video id="live-video" autoplay muted playsinline style="display:none"></video>
 
-    <!-- Live camera view -->
-    <div class="camera-container" id="camera-container" style="display:none">
-        <video id="live-video" autoplay muted playsinline></video>
         <div class="timer-overlay" id="timer-overlay">
             <svg class="timer-ring" viewBox="0 0 120 120">
                 <circle class="timer-ring-bg" cx="60" cy="60" r="54"/>
                 <circle class="timer-ring-progress" id="timer-ring-progress" cx="60" cy="60" r="54"/>
             </svg>
             <span class="timer-number" id="timer-number">{{ $duration }}</span>
+        </div>
+
+        <!-- Script overlay -->
+        <div class="script-overlay" id="teleprompter">
+            <div class="teleprompter-inner" id="teleprompter-inner">
+                <p>{!! nl2br(e(\App\Services\TemplateService::render('page_record_script', [
+                    'ad'       => $application->name,
+                    'soyad'    => $application->surname,
+                    'ad_soyad' => $application->name . ' ' . $application->surname,
+                    'telefon'  => $application->phone,
+                    'mebleg'   => $application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN' : '',
+                ], 'Mən, ' . $application->name . ' ' . $application->surname . ', ' . ($application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN məbləğində ' : '') . 'kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: ' . $application->phone . '. Bu müraciəti şüurlu şəkildə edirəm.'))) !!}</p>
+            </div>
+        </div>
+
+        <!-- Start overlay -->
+        <div id="start-screen" class="start-overlay">
+            <button id="start-btn" class="btn btn-primary btn-start">&#9654; Başla</button>
         </div>
     </div>
 
@@ -131,38 +131,27 @@
     margin-top: 1px;
     stroke: #ca8a04;
 }
-.teleprompter {
-    position: relative;
-    /* 2 sətir: font 1.4rem × line-height 1.75 × 2 + padding 20px */
-    height: calc(1.4rem * 1.75 * 2 + 20px);
-    overflow: hidden;
-    background: var(--color-card, #fff);
-    border: 1.5px solid var(--color-border, #e2e8f0);
-    border-radius: 10px;
-    margin-bottom: 8px;
+.script-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(0, 0, 0, 0.58);
+    z-index: 5;
+    padding: 14px 20px 18px;
 }
 .teleprompter-inner {
-    padding: 10px 20px 60px;
-    font-size: 1.4rem;
+    font-size: 1.15rem;
     line-height: 1.75;
-    color: var(--color-text, #1e293b);
+    color: #fff;
     font-weight: 600;
-    will-change: transform;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
 }
-.teleprompter-fade {
+.start-overlay {
     position: absolute;
-    left: 0; right: 0;
-    height: 28px;
-    pointer-events: none;
-    z-index: 2;
-}
-.teleprompter-fade-top {
-    top: 0;
-    background: linear-gradient(to bottom, var(--color-card, #fff), transparent);
-}
-.teleprompter-fade-bottom {
-    bottom: 0;
-    background: linear-gradient(to top, var(--color-card, #fff), transparent);
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
 }
 .early-actions {
     display: flex;

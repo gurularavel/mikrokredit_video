@@ -174,7 +174,7 @@
 
         mediaRecorder.start(1000);
         startCountdown();
-        setTimeout(startTeleprompter, 3000);
+        // teleprompter is static — no scroll needed
     }
 
     function stopStream() {
@@ -194,8 +194,8 @@
     async function initCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            startScreen.style.display     = 'none';
-            cameraContainer.style.display = 'block';
+            startScreen.style.display  = 'none';
+            liveVideo.style.display    = 'block';
             startRecording(stream);
         } catch (err) {
             statusMsg.textContent = 'Kameraya giriş icazəsi verilmədi: ' + err.message;
@@ -223,9 +223,9 @@
         stopRecording();
         stopStream();
         resetTeleprompter();
-        earlyActions.style.display    = 'none';
-        cameraContainer.style.display = 'none';
-        startScreen.style.display     = 'block';
+        earlyActions.style.display = 'none';
+        liveVideo.style.display    = 'none';
+        startScreen.style.display  = 'block';
         startBtn.disabled    = false;
         startBtn.textContent = '▶ Başla';
     });
@@ -239,8 +239,9 @@
         }
         recordedBlob = null;
         resetTeleprompter();
-        initCamera();
         cameraContainer.style.display = 'block';
+        liveVideo.style.display       = 'none';
+        initCamera();
     });
 
     // Preview "Göndər"

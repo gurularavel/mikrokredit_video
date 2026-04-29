@@ -21,6 +21,6 @@
         <h2>{{ \App\Services\TemplateService::render('page_error_notfound_title', [], 'Link tapılmadı') }}</h2>
         <p>{{ \App\Services\TemplateService::render('page_error_notfound_body', [], 'Belə bir link mövcud deyil. Zəhmət olmasa linki yoxlayın.') }}</p>
     @endif
-    <a href="{{ route('applications.index') }}" class="btn btn-secondary">Ana Səhifəyə Qayıt</a>
+    <a href="{{ url('/') }}" class="btn btn-secondary">Ana Səhifəyə Qayıt</a>
 </div>
 @endsection

@@ -12,6 +12,6 @@
     <h2>{{ \App\Services\TemplateService::render('page_sent_title', [], 'SMS Göndərildi!') }}</h2>
     <p>{{ \App\Services\TemplateService::render('page_sent_body', [], 'Telefon nömrənizə video qeydiyyat linki göndərildi. Zəhmət olmasa telefonunuzu yoxlayın.') }}</p>
     <p class="hint">{{ \App\Services\TemplateService::render('page_sent_hint', ['muddet' => config('sms.expiry_minutes')], 'Link ' . config('sms.expiry_minutes') . ' dəqiqə ərzində etibarlıdır.') }}</p>
-    <a href="{{ route('applications.index') }}" class="btn btn-secondary">Geri qayıt</a>
+    <a href="{{ url('/') }}" class="btn btn-secondary">Geri qayıt</a>
 </div>
 @endsection

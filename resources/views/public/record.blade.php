@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Video Qeydiyyat')
+@section('title', 'Video Müraciət')
 
 @push('head')
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -10,11 +10,6 @@
 <div class="record-page" id="record-app"
      data-duration="{{ $duration }}"
      data-upload-url="{{ route('record.upload', $application->token) }}">
-
-    <div class="record-header">
-        <h1>Video Müraciət</h1>
-        <p>Kamera başlayacaq — aşağıdakı mətni oxuyun.</p>
-    </div>
 
     @if($application->amount)
     <div class="amount-badge">
@@ -45,7 +40,7 @@
             <span class="timer-number" id="timer-number">{{ $duration }}</span>
         </div>
 
-        <!-- Script overlay -->
+        <!-- Script overlay at bottom -->
         <div class="script-overlay" id="teleprompter">
             <div class="teleprompter-inner" id="teleprompter-inner">
                 <p>{!! nl2br(e(\App\Services\TemplateService::render('page_record_script', [
@@ -91,16 +86,20 @@
 
 @push('head')
 <style>
+/* Mobile-first: reduce container padding for record page */
+.record-page-wrap { padding: 10px 12px; }
+.public-layout .container { padding: 10px 12px; }
+
 .amount-badge {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: var(--color-card, #fff);
     border: 1.5px solid var(--color-border, #e2e8f0);
-    border-radius: 10px;
-    padding: 9px 16px;
-    margin-bottom: 8px;
-    font-size: 1rem;
+    border-radius: 8px;
+    padding: 6px 12px;
+    margin-bottom: 6px;
+    font-size: .9rem;
 }
 .amount-label {
     color: var(--color-text-secondary, #64748b);
@@ -108,43 +107,44 @@
 }
 .amount-value {
     font-weight: 700;
-    font-size: 1.15rem;
     color: var(--color-primary, #2563eb);
 }
 .record-warning {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
     background: #fefce8;
     border: 1.5px solid #fde047;
-    border-radius: 10px;
-    padding: 9px 14px;
-    margin-bottom: 8px;
+    border-radius: 8px;
+    padding: 6px 12px;
+    margin-bottom: 6px;
     color: #854d0e;
-    font-size: .9375rem;
-    line-height: 1.5;
+    font-size: .85rem;
+    line-height: 1.45;
 }
 .record-warning svg {
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+    width: 17px;
+    height: 17px;
     margin-top: 1px;
     stroke: #ca8a04;
 }
+/* Script overlay on top of video */
 .script-overlay {
     position: absolute;
     bottom: 0; left: 0; right: 0;
-    background: rgba(0, 0, 0, 0.58);
+    background: rgba(0, 0, 0, 0.62);
     z-index: 5;
-    padding: 14px 20px 18px;
+    padding: 14px 16px 20px;
 }
 .teleprompter-inner {
-    font-size: 1.15rem;
-    line-height: 1.75;
+    font-size: 1.05rem;
+    line-height: 1.7;
     color: #fff;
     font-weight: 600;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
+/* Start button overlay */
 .start-overlay {
     position: absolute;
     inset: 0;
@@ -155,13 +155,13 @@
 }
 .early-actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
-    margin-top: 12px;
+    margin-top: 10px;
     animation: fadeInUp .4s ease;
 }
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 </style>

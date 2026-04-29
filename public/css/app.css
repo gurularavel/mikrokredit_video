@@ -242,7 +242,7 @@ body {
 /* =========================================================
    Record Page
    ========================================================= */
-.record-page { max-width: 640px; margin: 0 auto; }
+.record-page { max-width: 480px; margin: 0 auto; }
 
 .record-header {
     text-align: center;
@@ -289,7 +289,10 @@ body {
     background: #0B1629;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    aspect-ratio: 4/3;
+    aspect-ratio: 9/16;
+    max-height: 72vh;
+    max-height: 72svh;
+    width: 100%;
     box-shadow: 0 8px 32px rgba(11,22,41,.25);
 }
 

@@ -67,6 +67,6 @@ class OrderController extends Controller
             'expires_at'   => $expiresAt->toIso8601ZuluString(),
             'upload_url'   => url('/api/upload/video'),
             'show_link'    => route('video.show', $accessToken),
-        ]);
+        ], 200, [], JSON_UNESCAPED_SLASHES);
     }
 }

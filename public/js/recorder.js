@@ -208,6 +208,7 @@
     startBtn.addEventListener('click', () => {
         startBtn.disabled    = true;
         startBtn.textContent = 'Kamera açılır...';
+        cameraContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
         initCamera();
     });
 

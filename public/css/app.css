@@ -331,20 +331,17 @@ body {
     font-family: var(--font);
 }
 
-.preview-container { margin-top: 16px; }
+.preview-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(11,22,41,.2);
+    background: #0B1629;
+}
 
 .preview-container video {
     width: 100%;
-    border-radius: var(--radius-lg);
-    background: #0B1629;
-    box-shadow: 0 8px 32px rgba(11,22,41,.2);
-}
-
-.preview-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 14px;
-    justify-content: center;
+    display: block;
 }
 
 .upload-overlay {

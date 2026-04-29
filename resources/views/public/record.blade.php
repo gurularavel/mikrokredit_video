@@ -40,7 +40,7 @@
             <span class="timer-number" id="timer-number">{{ $duration }}</span>
         </div>
 
-        <!-- Script overlay at bottom -->
+        <!-- Script overlay -->
         <div class="script-overlay" id="teleprompter">
             <div class="teleprompter-inner" id="teleprompter-inner">
                 <p>{!! nl2br(e(\App\Services\TemplateService::render('page_record_script', [
@@ -53,22 +53,23 @@
             </div>
         </div>
 
+        <!-- Early action buttons — overlay, visible at 10s remaining -->
+        <div class="video-actions-overlay" id="early-actions" style="display:none">
+            <button class="btn btn-secondary" id="early-rerecord-btn">Yenidən çək</button>
+            <button class="btn btn-primary" id="early-confirm-btn">Göndər</button>
+        </div>
+
         <!-- Start overlay -->
         <div id="start-screen" class="start-overlay">
             <button id="start-btn" class="btn btn-primary btn-start">&#9654; Başla</button>
         </div>
     </div>
 
-    <!-- Early action buttons (visible at 10s remaining) -->
-    <div class="early-actions" id="early-actions" style="display:none">
-        <button class="btn btn-secondary" id="early-rerecord-btn">Yenidən çək</button>
-        <button class="btn btn-primary" id="early-confirm-btn">Göndər</button>
-    </div>
-
     <!-- Preview after recording -->
     <div class="preview-container" id="preview-container" style="display:none">
         <video id="preview-video" controls playsinline></video>
-        <div class="preview-actions">
+        <!-- Preview actions overlay -->
+        <div class="video-actions-overlay">
             <button class="btn btn-secondary" id="rerecord-btn">Yenidən çək</button>
             <button class="btn btn-primary" id="confirm-btn">Göndər</button>
         </div>
@@ -86,8 +87,6 @@
 
 @push('head')
 <style>
-/* Mobile-first: reduce container padding for record page */
-.record-page-wrap { padding: 10px 12px; }
 .public-layout .container { padding: 10px 12px; }
 
 .amount-badge {
@@ -101,14 +100,9 @@
     margin-bottom: 6px;
     font-size: .9rem;
 }
-.amount-label {
-    color: var(--color-text-secondary, #64748b);
-    font-weight: 500;
-}
-.amount-value {
-    font-weight: 700;
-    color: var(--color-primary, #2563eb);
-}
+.amount-label { color: var(--color-text-secondary, #64748b); font-weight: 500; }
+.amount-value { font-weight: 700; color: var(--color-primary, #2563eb); }
+
 .record-warning {
     display: flex;
     align-items: flex-start;
@@ -124,12 +118,12 @@
 }
 .record-warning svg {
     flex-shrink: 0;
-    width: 17px;
-    height: 17px;
+    width: 17px; height: 17px;
     margin-top: 1px;
     stroke: #ca8a04;
 }
-/* Script overlay on top of video */
+
+/* Script overlay */
 .script-overlay {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -144,6 +138,20 @@
     font-weight: 600;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
+
+/* Shared overlay for action buttons (early + preview) */
+.video-actions-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 16px 16px 22px;
+    background: rgba(0, 0, 0, 0.72);
+    z-index: 20;
+    animation: fadeInUp .35s ease;
+}
+
 /* Start button overlay */
 .start-overlay {
     position: absolute;
@@ -153,15 +161,9 @@
     justify-content: center;
     z-index: 10;
 }
-.early-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 10px;
-    animation: fadeInUp .4s ease;
-}
+
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 </style>

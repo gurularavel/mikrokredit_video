@@ -157,7 +157,7 @@ html, body { height: 100%; }
     padding: 14px 16px 20px;
 }
 .teleprompter-inner {
-    font-size: 1.3rem;
+    font-size: 1.6rem;
     line-height: 1.7;
     color: #fff;
     font-weight: 600;

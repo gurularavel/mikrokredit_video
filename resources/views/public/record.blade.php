@@ -14,7 +14,7 @@
     @if($application->amount)
     <div class="amount-badge">
         <span class="amount-label">Kredit məbləği:</span>
-        <span class="amount-value">{{ number_format($application->amount, 2, '.', ' ') }} AZN</span>
+        <span class="amount-value">{{ number_format($application->amount, fmod($application->amount, 1) == 0 ? 0 : 2, '.', ' ') }} AZN</span>
     </div>
     @endif
 
@@ -48,8 +48,8 @@
                     'soyad'    => $application->surname,
                     'ad_soyad' => $application->name . ' ' . $application->surname,
                     'telefon'  => $application->phone,
-                    'mebleg'   => $application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN' : '',
-                ], 'Mən, ' . $application->name . ' ' . $application->surname . ', ' . ($application->amount ? number_format($application->amount, 2, '.', ' ') . ' AZN məbləğində ' : '') . 'kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: ' . $application->phone . '. Bu müraciəti şüurlu şəkildə edirəm.'))) !!}</p>
+                    'mebleg'   => $application->amount ? number_format($application->amount, fmod($application->amount, 1) == 0 ? 0 : 2, '.', ' ') . ' AZN' : '',
+                ], 'Mən, ' . $application->name . ' ' . $application->surname . ', ' . ($application->amount ? number_format($application->amount, fmod($application->amount, 1) == 0 ? 0 : 2, '.', ' ') . ' AZN məbləğində ' : '') . 'kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: ' . $application->phone . '. Bu müraciəti şüurlu şəkildə edirəm.'))) !!}</p>
             </div>
         </div>
 

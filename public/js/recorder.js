@@ -148,7 +148,10 @@
         earlyActions.style.display = 'none';
 
         const mimeType = getMimeType();
-        mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
+        const recorderOpts = mimeType
+            ? { mimeType, videoBitsPerSecond: 500_000 }
+            : { videoBitsPerSecond: 500_000 };
+        mediaRecorder = new MediaRecorder(stream, recorderOpts);
 
         mediaRecorder.ondataavailable = (e) => {
             if (e.data && e.data.size > 0) chunks.push(e.data);
@@ -193,7 +196,10 @@
 
     async function initCamera() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } },
+                audio: true,
+            });
             startScreen.style.display  = 'none';
             liveVideo.style.display    = 'block';
             startRecording(stream);

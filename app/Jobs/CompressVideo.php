@@ -48,14 +48,14 @@ class CompressVideo implements ShouldQueue
 
         if ($isWebm) {
             $cmd = sprintf(
-                '%s -y -i %s -c:v libvpx-vp9 -crf 33 -b:v 0 -c:a libopus -b:a 64k %s 2>&1',
+                '%s -y -i %s -vf "scale=\'min(640,iw)\':-2" -c:v libvpx-vp9 -crf 36-b:v 0 -c:a libopus -b:a 64k %s 2>&1',
                 escapeshellcmd($ffmpeg),
                 escapeshellarg($inputPath),
                 escapeshellarg($tempPath)
             );
         } else {
             $cmd = sprintf(
-                '%s -y -i %s -c:v libx264 -crf 28 -preset fast -c:a aac -b:a 64k %s 2>&1',
+                '%s -y -i %s -vf "scale=\'min(640,iw)\':-2" -c:v libx264 -crf 30 -preset fast -c:a aac -b:a 64k -movflags +faststart %s 2>&1',
                 escapeshellcmd($ffmpeg),
                 escapeshellarg($inputPath),
                 escapeshellarg($tempPath)

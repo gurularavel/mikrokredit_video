@@ -11,7 +11,7 @@ use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
-Route::get('/', fn() => redirect()->route('admin.login'));
+Route::get('/', fn() => view('welcome'));
 Route::get('/applications/sent', [ApplicationController::class, 'sent'])->name('applications.sent');
 
 // Video recording routes (token-gated)
@@ -23,12 +23,12 @@ Route::get('/record/{token}/complete', [RecordController::class, 'complete'])->n
 Route::get('/video/{access_token}', [RecordController::class, 'showVideo'])->name('video.show');
 
 // Admin auth routes
-Route::get('/admin/login', [AuthController::class, 'showLogin'])->name('admin.login');
-Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.post');
-Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
+Route::get('/dash/login', [AuthController::class, 'showLogin'])->name('admin.login');
+Route::post('/dash/login', [AuthController::class, 'login'])->name('admin.login.post');
+Route::post('/dash/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
 // Admin panel routes (protected)
-Route::middleware('admin.auth')->prefix('admin')->name('admin.')->group(function () {
+Route::middleware('admin.auth')->prefix('dash')->name('admin.')->group(function () {
     Route::get('/', fn() => redirect()->route('admin.applications.index'));
     Route::get('/applications', [AdminApplicationController::class, 'index'])->name('applications.index');
     Route::get('/applications/create', [AdminApplicationController::class, 'create'])->name('applications.create');

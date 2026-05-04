@@ -1,84 +1,42 @@
-name: 🚀 Deploy via SSH with Incremental Updates
+name: Deploy test-vr
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+
     steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: 🔍 Get changed files
-        id: changed-files
+      - name: Deploy Laravel app
         run: |
-          echo "files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')" >> $GITHUB_OUTPUT
-      - name: 📂 Deploy using SSH
-        uses: appleboy/ssh-action@master
-        env:
-          CHANGED_FILES: ${{ steps.changed-files.outputs.files }}
-          REPO_URL: https://${{ secrets.GIT_TOKEN }}@github.com/gurularavel/videorec20.git
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USERNAME }}
-          password: ${{ secrets.REMOTE_PASSWORD }}
-          port: 222
-          envs: CHANGED_FILES,REPO_URL
-          script: |
-            cd /usr/www/users/kvadrv/projects/videorec
+          set -e
 
-            # Remove existing git directory if it exists
-            rm -rf .git
+          cd /video/videorec20
 
-            # Create fresh git directory
-            git init
-            git config --local user.email "github-actions@github.com"
-            git config --local user.name "GitHub Actions"
+          git fetch origin main
+          git reset --hard origin/main
+          git clean -fd
 
-            # Add remote with embedded token
-            git remote add origin "$REPO_URL"
+          composer install --no-dev --optimize-autoloader
 
-            # Create deployment directory
-            mkdir -p .deployment
-            echo "none" > .deployment/last_commit
+          npm install
+          npm run build
 
-            # Fetch only the main branch
-            git fetch origin main:main
+          php artisan migrate --force
 
-            LAST_COMMIT=$(cat .deployment/last_commit)
+          php artisan config:clear
+          php artisan cache:clear
+          php artisan route:clear
+          php artisan view:clear
 
-            if [ "$LAST_COMMIT" != "none" ]; then
-              echo "Changed files: $CHANGED_FILES"
-              for file in $CHANGED_FILES; do
-                if [ -n "$file" ]; then
-                  echo "Updating: $file"
-                  git checkout main -- "$file"
-                  mkdir -p "$(dirname "$file")"
-                  cp -f "$file" "$file"
-                fi
-              done
-            else
-              git checkout main -f
-              echo "Initial deployment - all files updated"
-            fi
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
 
-            git rev-parse main > .deployment/last_commit
+          chmod -R 775 storage bootstrap/cache
 
-            # Set permissions
-            find . -type d -exec chmod 755 {} \;
-            find . -type f -exec chmod 644 {} \;
-            chmod -R 755 storage bootstrap/cache 2>/dev/null || true
-
-            # Create deployment log
-            echo "Deployment completed at $(date)" > .deployment/deploy_log.txt
-            echo "Changed files:" >> .deployment/deploy_log.txt
-            echo "$CHANGED_FILES" >> .deployment/deploy_log.txt
-
-            # Clean up by removing .git directory
-            rm -rf .git
-
-            echo "Deployment completed successfully"
-            echo "Deployment log:"
-            cat .deployment/deploy_log.txt
+          sudo systemctl reload php8.3-fpm
+          sudo systemctl reload nginx

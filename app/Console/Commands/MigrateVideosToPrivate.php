@@ -51,7 +51,6 @@ class MigrateVideosToPrivate extends Command
             $this->line("  [#{$app->id}] Moved: {$sourcePath}");
             $moved++;
         }
-
         $this->info("Done. Moved: {$moved}, Failed: {$failed}");
 
         return $failed > 0 ? 1 : 0;

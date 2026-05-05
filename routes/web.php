@@ -21,6 +21,7 @@ Route::get('/record/{token}/complete', [RecordController::class, 'complete'])->n
 
 // Public video view (access_token ile, avtorizasiyasiz)
 Route::get('/video/{access_token}', [RecordController::class, 'showVideo'])->name('video.show');
+Route::get('/video/{access_token}/stream', [RecordController::class, 'streamVideo'])->name('video.stream');
 
 // Admin auth routes
 Route::get('/dash/login', [AuthController::class, 'showLogin'])->name('admin.login');
@@ -35,6 +36,7 @@ Route::middleware('admin.auth')->prefix('dash')->name('admin.')->group(function 
     Route::post('/applications', [AdminApplicationController::class, 'store'])->name('applications.store');
     Route::get('/applications/{application}', [AdminApplicationController::class, 'show'])->name('applications.show');
     Route::patch('/applications/{application}/status', [AdminApplicationController::class, 'updateStatus'])->name('applications.updateStatus');
+    Route::get('/videos/{application}/stream', [AdminApplicationController::class, 'streamVideo'])->name('videos.stream');
     Route::get('/sms-logs', [SmsLogController::class, 'index'])->name('sms-logs.index');
     Route::get('/password', [AuthController::class, 'showChangePassword'])->name('password');
     Route::post('/password', [AuthController::class, 'changePassword'])->name('password.update');

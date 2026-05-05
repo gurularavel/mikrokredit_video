@@ -35,8 +35,8 @@
     </div>
 
     <video controls playsinline class="video-show-player">
-        <source src="{{ $application->videoUrl() }}" type="video/webm">
-        <source src="{{ $application->videoUrl() }}" type="video/mp4">
+        <source src="{{ $application->publicStreamUrl() }}" type="video/webm">
+        <source src="{{ $application->publicStreamUrl() }}" type="video/mp4">
     </video>
 
     @if($application->amount)

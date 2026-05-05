@@ -90,6 +90,14 @@ class Application extends Model
         if (!$this->video_path) {
             return null;
         }
-        return Storage::disk($this->video_disk)->url($this->video_path);
+        return route('admin.videos.stream', $this->id);
+    }
+
+    public function publicStreamUrl(): ?string
+    {
+        if (!$this->video_path || !$this->access_token) {
+            return null;
+        }
+        return route('video.stream', $this->access_token);
     }
 }

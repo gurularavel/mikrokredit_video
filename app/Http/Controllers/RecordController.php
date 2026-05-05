@@ -95,4 +95,27 @@ class RecordController extends Controller
 
         return view('public.video', ['application' => $application]);
     }
+
+    public function streamVideo(string $accessToken)
+    {
+        $application = Application::where('access_token', $accessToken)->first();
+
+        if (!$application || !$application->video_path) {
+            abort(404);
+        }
+
+        $disk = $application->video_disk ?: 'local';
+        $fullPath = Storage::disk($disk)->path($application->video_path);
+
+        if (!file_exists($fullPath)) {
+            abort(404);
+        }
+
+        $mime = str_ends_with($application->video_path, '.mp4') ? 'video/mp4' : 'video/webm';
+
+        return response()->file($fullPath, [
+            'Content-Type'  => $mime,
+            'Cache-Control' => 'no-store, private',
+        ]);
+    }
 }

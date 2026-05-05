@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\SendApplicationSms;
 use App\Models\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ApplicationController extends Controller
@@ -88,5 +89,26 @@ class ApplicationController extends Controller
         $application->update(['status' => $request->status]);
 
         return redirect()->back()->with('success', 'Status uğurla yeniləndi.');
+    }
+
+    public function streamVideo(Application $application)
+    {
+        if (!$application->video_path) {
+            abort(404);
+        }
+
+        $disk = $application->video_disk ?: 'local';
+        $fullPath = Storage::disk($disk)->path($application->video_path);
+
+        if (!file_exists($fullPath)) {
+            abort(404);
+        }
+
+        $mime = str_ends_with($application->video_path, '.mp4') ? 'video/mp4' : 'video/webm';
+
+        return response()->file($fullPath, [
+            'Content-Type'  => $mime,
+            'Cache-Control' => 'no-store, private',
+        ]);
     }
 }

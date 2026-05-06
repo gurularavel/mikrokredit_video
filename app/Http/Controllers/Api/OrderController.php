@@ -59,14 +59,20 @@ class OrderController extends Controller
 
         dispatch(new SendApplicationSms($application));
 
+        $appBase    = rtrim(config('app.url'), '/');
+        $publicBase = rtrim(config('app.public_url'), '/');
+        $toPublic   = fn(string $url): string => $publicBase !== $appBase
+            ? substr_replace($url, $publicBase, 0, strlen($appBase))
+            : $url;
+
         return response()->json([
             'success'      => 1,
             'message'      => 'Order created successfully',
-            'redirect_url' => route('record.show', $videoToken),
+            'redirect_url' => $toPublic(route('record.show', $videoToken)),
             'token'        => $accessToken,
             'expires_at'   => $expiresAt->toIso8601ZuluString(),
-            'upload_url'   => url('/api/upload/video'),
-            'show_link'    => route('video.show', $accessToken),
+            'upload_url'   => $toPublic(url('/api/upload/video')),
+            'show_link'    => $toPublic(route('video.show', $accessToken)),
         ], 200, [], JSON_UNESCAPED_SLASHES);
     }
 }

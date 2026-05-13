@@ -14,6 +14,21 @@ class OrderController extends Controller
 {
     public function store(Request $request): JsonResponse
     {
+        try {
+            $logDir = storage_path('logs/api-orders');
+            if (!is_dir($logDir)) {
+                mkdir($logDir, 0755, true);
+            }
+            $logLine = sprintf(
+                "[%s] IP: %s | Body: %s\n",
+                now()->format('d.m.Y H:i:s'),
+                $request->ip(),
+                json_encode($request->all(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+            );
+            file_put_contents($logDir . '/log-' . now()->format('d.m.Y') . '.log', $logLine, FILE_APPEND | LOCK_EX);
+        } catch (\Throwable) {
+        }
+
         $validated = $request->validate([
             'app_id'       => 'required|string|max:100',
             'phone'        => 'required|string|max:20',

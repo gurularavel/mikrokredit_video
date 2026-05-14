@@ -587,7 +587,84 @@ dd {
    Pagination
    ========================================================= */
 .pagination-wrapper { margin-top: 18px; }
-.pagination-wrapper nav { display: flex; justify-content: center; }
+
+.pagination-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.pagination-info {
+    font-size: .8rem;
+    color: var(--color-text-muted);
+}
+
+.pagination-list {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.page-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    font-size: .825rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-card);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s, border-color .15s, color .15s;
+    user-select: none;
+}
+
+a.page-item:hover {
+    background: var(--color-primary-ultra);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.page-item.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+    font-weight: 600;
+    cursor: default;
+}
+
+.page-item.disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.page-item.dots {
+    border: none;
+    background: none;
+    cursor: default;
+    color: var(--color-text-muted);
+}
+
+html.dark .page-item {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text-secondary);
+}
+
+html.dark a.page-item:hover {
+    background: var(--color-primary-ultra);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
 
 /* =========================================================
    Log link

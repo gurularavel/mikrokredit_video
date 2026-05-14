@@ -32,16 +32,15 @@ class SendSmsJob implements ShouldQueue, ShouldBeUnique
 
         if ($provider === 'postaGuvercini') {
             $result = (new PostaGuverciniSmsService())->send($phone, $message);
+            $success = ($result['success'] ?? 0) === 1;
         } else {
-            $result = (new LSimSmsService())->send($phone, $message);
+            $success = (new LSimSmsService())->send($phone, $message);
 
-            if (($result['success'] ?? 0) === 0 && config('sms.pg.api_url')) {
-                Log::warning('LSim SMS failed, trying Posta Güvercini fallback', [
-                    'phone'       => $phone,
-                    'lsim_result' => $result,
-                ]);
-                $result = (new PostaGuverciniSmsService())->send($phone, $message);
-                Log::info('Posta Güvercini fallback result', ['phone' => $phone, 'result' => $result]);
+            if (!$success && config('sms.pg.api_url')) {
+                Log::warning('LSim SMS failed, trying Posta Güvercini fallback', ['phone' => $phone]);
+                $result  = (new PostaGuverciniSmsService())->send($phone, $message);
+                $success = ($result['success'] ?? 0) === 1;
+                Log::info('Posta Güvercini fallback result', ['phone' => $phone, 'success' => $success]);
             }
         }
 
@@ -50,7 +49,7 @@ class SendSmsJob implements ShouldQueue, ShouldBeUnique
             'session_id'  => $this->data['session_id']  ?? null,
             'phone'       => $phone,
             'message'     => $message,
-            'status'      => $result['status'] ?? 'failed',
+            'status'      => $success ? 'sent' : 'failed',
             'url'         => $this->data['url'] ?? null,
         ]);
     }

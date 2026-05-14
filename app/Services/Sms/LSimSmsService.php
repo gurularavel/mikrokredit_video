@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
-class LSimSmsService
+class LSimSmsService implements SmsServiceInterface
 {
     protected Client $httpClient;
     protected string $apiUrl;
@@ -23,9 +23,9 @@ class LSimSmsService
         $this->sender     = config('sms.lsim.sender');
     }
 
-    public function send(string $phone, string $message): array
+    public function send(string $phone, string $message): bool
     {
-        $phone = '994' . $phone;
+        $phone = '994' . preg_replace('/^\+?994/', '', $phone);
 
         $passwordHashed = md5($this->apiKey);
         $key = md5($passwordHashed . $this->username . $message . $phone . $this->sender);
@@ -44,18 +44,18 @@ class LSimSmsService
             $body     = json_decode($response->getBody()->getContents(), true);
 
             if (empty($body['errorCode'])) {
-                return ['success' => 1, 'status' => 'sent'];
+                return true;
             }
 
-            return ['success' => 0, 'status' => 'failed', 'message' => $body['errorCode']];
+            Log::error('LSimSmsService error', ['phone' => $phone, 'error' => $body['errorCode']]);
+            return false;
         } catch (RequestException $e) {
-            $message = $e->hasResponse()
+            $error = $e->hasResponse()
                 ? $e->getResponse()->getReasonPhrase()
                 : $e->getMessage();
 
-            Log::error('LSimSmsService error', ['phone' => $phone, 'error' => $message]);
-
-            return ['success' => 0, 'status' => 'failed', 'message' => $message];
+            Log::error('LSimSmsService error', ['phone' => $phone, 'error' => $error]);
+            return false;
         }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\Sms\LogSmsService;
+use App\Services\Sms\LSimSmsService;
 use App\Services\Sms\SmsAzService;
 use App\Services\Sms\SmsServiceInterface;
 use App\Services\Sms\TwilioSmsService;
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
                     config('sms.smsaz.secret'),
                     config('sms.smsaz.sender'),
                 ),
+                'lsim' => new LSimSmsService(),
                 default => new LogSmsService(),
             };
         });

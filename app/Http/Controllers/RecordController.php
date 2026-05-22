@@ -85,9 +85,9 @@ class RecordController extends Controller
         return view('public.complete', ['application' => $application]);
     }
 
-    public function showVideo(string $accessToken)
+    public function showVideo(string $appId)
     {
-        $application = Application::where('access_token', $accessToken)->first();
+        $application = Application::where('app_id', $appId)->latest()->first();
 
         if (!$application || !$application->video_path) {
             abort(404);
@@ -96,9 +96,9 @@ class RecordController extends Controller
         return view('public.video', ['application' => $application]);
     }
 
-    public function streamVideo(string $accessToken)
+    public function streamVideo(string $appId)
     {
-        $application = Application::where('access_token', $accessToken)->first();
+        $application = Application::where('app_id', $appId)->latest()->first();
 
         if (!$application || !$application->video_path) {
             abort(404);

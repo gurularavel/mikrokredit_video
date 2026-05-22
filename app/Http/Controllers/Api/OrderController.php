@@ -31,7 +31,7 @@ class OrderController extends Controller
         }
 
         $validated = $request->validate([
-            'app_id'       => 'required|string|max:100',
+            'app_id'       => 'required|string|max:100|unique:applications,app_id',
             'phone'        => 'required|string|max:20',
             'amount'       => 'required|numeric|min:0',
             'webhook_url'  => 'nullable|url',
@@ -83,10 +83,10 @@ class OrderController extends Controller
             'success'      => 1,
             'message'      => 'Order created successfully',
             'redirect_url' => $toPublic(route('record.show', $videoToken)),
-            'token'        => $accessToken,
-            'expires_at'   => $expiresAt->toIso8601ZuluString(),
-            'upload_url'   => $toPublic(url('/api/upload/video')),
-            'show_link'    => $toPublic(route('video.show', $accessToken)),
+            // 'token'        => $accessToken,
+            // 'expires_at'   => $expiresAt->toIso8601ZuluString(),
+            // 'upload_url'   => $toPublic(url('/api/upload/video')),
+            // 'show_link'    => $toPublic(route('video.show', $validated['app_id'])),
         ], 200, [], JSON_UNESCAPED_SLASHES);
     }
 }

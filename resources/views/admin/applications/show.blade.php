@@ -31,12 +31,12 @@
                     </button>
                 </div>
             </dd>
-            @if($application->access_token)
+            @if($application->app_id)
             <dt>Video linki</dt>
             <dd>
                 <div class="sms-link-row">
-                    <span class="sms-link-text">{{ route('video.show', $application->access_token) }}</span>
-                    <button type="button" class="key-icon-btn key-copy" data-copy="{{ route('video.show', $application->access_token) }}" title="Kopyala">
+                    <span class="sms-link-text">{{ route('video.show', $application->app_id) }}</span>
+                    <button type="button" class="key-icon-btn key-copy" data-copy="{{ route('video.show', $application->app_id) }}" title="Kopyala">
                         <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                         <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;color:var(--color-success)"><polyline points="20 6 9 17 4 12"/></svg>
                     </button>

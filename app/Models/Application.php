@@ -95,9 +95,9 @@ class Application extends Model
 
     public function publicStreamUrl(): ?string
     {
-        if (!$this->video_path || !$this->access_token) {
+        if (!$this->video_path || !$this->app_id) {
             return null;
         }
-        return route('video.stream', $this->access_token);
+        return route('video.stream', $this->app_id);
     }
 }

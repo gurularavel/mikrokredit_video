@@ -19,9 +19,9 @@ Route::get('/record/{token}', [RecordController::class, 'show'])->name('record.s
 Route::post('/record/{token}/upload', [RecordController::class, 'upload'])->name('record.upload');
 Route::get('/record/{token}/complete', [RecordController::class, 'complete'])->name('record.complete');
 
-// Public video view (access_token ile, avtorizasiyasiz)
-Route::get('/video/{access_token}', [RecordController::class, 'showVideo'])->name('video.show');
-Route::get('/video/{access_token}/stream', [RecordController::class, 'streamVideo'])->name('video.stream');
+// Public video view (app_id ile, avtorizasiyasiz)
+Route::get('/video/{app_id}', [RecordController::class, 'showVideo'])->name('video.show');
+Route::get('/video/{app_id}/stream', [RecordController::class, 'streamVideo'])->name('video.stream');
 
 // Admin auth routes
 Route::get('/dash/login', [AuthController::class, 'showLogin'])->name('admin.login');

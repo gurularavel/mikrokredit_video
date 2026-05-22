@@ -8,6 +8,7 @@ use App\Models\Application;
 use App\Models\Merchant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
@@ -74,11 +75,9 @@ class OrderController extends Controller
 
         dispatch(new SendApplicationSms($application));
 
-        $appBase    = rtrim(config('app.url'), '/');
         $publicBase = rtrim(config('app.public_url'), '/');
-        $toPublic   = fn(string $url): string => $publicBase !== $appBase
-            ? substr_replace($url, $publicBase, 0, strlen($appBase))
-            : $url;
+        URL::forceRootUrl($publicBase);
+        $toPublic = fn(string $url): string => $url;
 
         return response()->json([
             'success'      => 1,

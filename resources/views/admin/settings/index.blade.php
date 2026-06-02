@@ -52,6 +52,16 @@
 
         <button type="submit" class="btn btn-primary">Yadda saxla</button>
     </div>
+
+    <div class="detail-card" style="margin-top:16px">
+        <h3>Video Ekranı Altı Mətn</h3>
+        <p class="settings-hint">Müştəriyə göndərilən video çəkiliş ekranının altında göstəriləcək mətn. <code>&lt;br&gt;</code> ilə yeni sətir əlavə edə bilərsiniz.</p>
+        <div class="form-group">
+            <textarea name="record_bottom_note" rows="4"
+                      placeholder="Məs: Əlaqə üçün: 012 000 00 00&lt;br&gt;İş saatları: 09:00–18:00">{{ \App\Services\SettingService::get('record_bottom_note') }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Yadda saxla</button>
+    </div>
 </form>
 
 <style>

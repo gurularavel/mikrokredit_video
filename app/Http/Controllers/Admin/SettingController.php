@@ -17,15 +17,17 @@ class SettingController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'og_title'       => 'nullable|string|max:255',
-            'og_description' => 'nullable|string|max:500',
-            'og_image'       => 'nullable|image|max:2048',
-            'og_image_url'   => 'nullable|url|max:500',
+            'og_title'          => 'nullable|string|max:255',
+            'og_description'    => 'nullable|string|max:500',
+            'og_image'          => 'nullable|image|max:2048',
+            'og_image_url'      => 'nullable|url|max:500',
+            'record_bottom_note'=> 'nullable|string|max:2000',
         ]);
 
         $data = [
-            'og_title'       => $request->input('og_title'),
-            'og_description' => $request->input('og_description'),
+            'og_title'           => $request->input('og_title'),
+            'og_description'     => $request->input('og_description'),
+            'record_bottom_note' => $request->input('record_bottom_note'),
         ];
 
         if ($request->hasFile('og_image')) {

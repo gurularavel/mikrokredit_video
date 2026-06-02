@@ -36,6 +36,7 @@ Route::middleware('admin.auth')->prefix('dash')->name('admin.')->group(function 
     Route::post('/applications', [AdminApplicationController::class, 'store'])->name('applications.store');
     Route::get('/applications/{application}', [AdminApplicationController::class, 'show'])->name('applications.show');
     Route::patch('/applications/{application}/status', [AdminApplicationController::class, 'updateStatus'])->name('applications.updateStatus');
+    Route::patch('/applications/{application}/notes', [AdminApplicationController::class, 'updateNotes'])->name('applications.updateNotes');
     Route::get('/videos/{application}/stream', [AdminApplicationController::class, 'streamVideo'])->name('videos.stream');
     Route::get('/sms-logs', [SmsLogController::class, 'index'])->name('sms-logs.index');
     Route::get('/password', [AuthController::class, 'showChangePassword'])->name('password');

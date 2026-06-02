@@ -73,6 +73,7 @@
     </div>
 </div>
 
+
 @if($application->video_path)
 <div class="video-card">
     <h3>Video</h3>
@@ -95,6 +96,7 @@
 @endif
 @push('scripts')
 <style>
+
 .sms-link-row {
     display: flex;
     align-items: center;

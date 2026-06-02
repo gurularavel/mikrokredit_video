@@ -91,6 +91,17 @@ class ApplicationController extends Controller
         return redirect()->back()->with('success', 'Status uğurla yeniləndi.');
     }
 
+    public function updateNotes(Request $request, Application $application)
+    {
+        $request->validate([
+            'admin_notes' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        $application->update(['admin_notes' => $request->admin_notes]);
+
+        return redirect()->back()->with('success', 'Qeyd uğurla saxlanıldı.');
+    }
+
     public function streamVideo(Application $application)
     {
         if (!$application->video_path) {

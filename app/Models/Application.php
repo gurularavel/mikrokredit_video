@@ -32,6 +32,7 @@ class Application extends Model
         'video_recorded_at',
         'sms_sent_at',
         'link_opened_at',
+        'admin_notes',
     ];
 
     protected $casts = [

@@ -82,6 +82,13 @@
     </div>
 
     <div class="status-msg" id="status-msg"></div>
+
+    @php $recordBottomNote = \App\Services\SettingService::get('record_bottom_note'); @endphp
+    @if($recordBottomNote)
+    <div class="record-admin-notes">
+        {!! $recordBottomNote !!}
+    </div>
+    @endif
 </div>
 @endsection
 
@@ -112,6 +119,17 @@ html, body { height: 100%; }
 #preview-container {
     flex: 1;
     min-height: 0;
+}
+
+.record-admin-notes {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: var(--color-card, #fff);
+    border: 1.5px solid var(--color-border, #e2e8f0);
+    border-radius: 8px;
+    font-size: .88rem;
+    line-height: 1.6;
+    color: var(--color-text, #1e293b);
 }
 
 .amount-badge {
@@ -175,6 +193,19 @@ html, body { height: 100%; }
     background: rgba(0, 0, 0, 0.72);
     z-index: 20;
     animation: fadeInUp .35s ease;
+}
+
+/* Early buttons pinned to the TOP */
+#early-actions {
+    top: 0;
+    bottom: auto;
+    padding: 18px 16px 14px;
+    animation-name: fadeInDown;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Start button overlay */

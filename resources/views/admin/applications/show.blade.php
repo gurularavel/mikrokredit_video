@@ -18,6 +18,18 @@
             @if($application->amount)
             <dt>Məbləğ</dt><dd>{{ number_format($application->amount, 2) }} AZN</dd>
             @endif
+            @if($application->app_id)
+            <dt>APP ID</dt>
+            <dd>
+                <div class="sms-link-row">
+                    <span class="sms-link-text">{{ $application->app_id }}</span>
+                    <button type="button" class="key-icon-btn key-copy" data-copy="{{ $application->app_id }}" title="Kopyala">
+                        <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                        <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;color:var(--color-success)"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                </div>
+            </dd>
+            @endif
             <dt>Müraciət tarixi</dt><dd>{{ $application->created_at->format('d.m.Y H:i') }}</dd>
             <dt>SMS göndərildi</dt><dd>{{ $application->sms_sent_at ? $application->sms_sent_at->format('d.m.Y H:i') : '—' }}</dd>
             <dt>Link açıldı</dt><dd>{{ $application->link_opened_at ? $application->link_opened_at->format('d.m.Y H:i:s') : '—' }}</dd>

@@ -31,7 +31,7 @@ class OrderController extends Controller
         }
 
         $validated = $request->validate([
-            'app_id'       => 'required|string|max:100|unique:applications,app_id',
+            'app_id'       => 'required|string|max:100',
             'phone'        => 'required|string|max:20',
             'amount'       => 'required|numeric|min:0',
             'webhook_url'  => 'nullable|url',
@@ -88,5 +88,31 @@ class OrderController extends Controller
             // 'upload_url'   => $toPublic(url('/api/upload/video')),
             // 'show_link'    => $toPublic(route('video.show', $validated['app_id'])),
         ], 200, [], JSON_UNESCAPED_SLASHES);
+    }
+
+    public function status(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'app_ids'   => 'required|array|min:1|max:500',
+            'app_ids.*' => 'required|string|max:100',
+        ]);
+
+        /** @var \App\Models\Merchant $merchant */
+        $merchant = $request->attributes->get('merchant');
+
+        $recorded = Application::where('merchant_id', $merchant->id)
+            ->whereIn('app_id', $validated['app_ids'])
+            ->whereNotNull('video_path')
+            ->pluck('app_id')
+            ->unique()
+            ->flip()
+            ->all();
+
+        $results = array_map(fn($id) => [
+            'app_id'   => $id,
+            'recorded' => isset($recorded[$id]),
+        ], $validated['app_ids']);
+
+        return response()->json(['results' => $results]);
     }
 }

@@ -40,7 +40,7 @@ class RecordController extends Controller
     {
         $logCtx = ['token' => substr($token, 0, 12) . '...'];
 
-        Log::channel('video_upload')->info('Upload başladı', array_merge($logCtx, [
+        Log::info('UPLOAD_LOG: Upload başladı', array_merge($logCtx, [
             'ip'           => $request->ip(),
             'content_type' => $request->header('Content-Type'),
             'content_length' => $request->header('Content-Length'),
@@ -51,27 +51,27 @@ class RecordController extends Controller
         $application = Application::where('token', $token)->first();
 
         if (!$application) {
-            Log::channel('video_upload')->warning('Token tapılmadı', $logCtx);
+            Log::warning('UPLOAD_LOG: Token tapılmadı', $logCtx);
             return response()->json(['success' => false, 'message' => 'Invalid token'], 422);
         }
 
         if ($application->isTokenExpired()) {
-            Log::channel('video_upload')->warning('Token vaxtı bitib', $logCtx);
+            Log::warning('UPLOAD_LOG: Token vaxtı bitib', $logCtx);
             return response()->json(['success' => false, 'message' => 'Invalid token'], 422);
         }
 
         if ($application->isTokenUsed()) {
-            Log::channel('video_upload')->warning('Token artıq istifadə edilib', $logCtx);
+            Log::warning('UPLOAD_LOG: Token artıq istifadə edilib', $logCtx);
             return response()->json(['success' => false, 'message' => 'Invalid token'], 422);
         }
 
         $maxKb = config('video.max_size_kb', 51200);
 
-        Log::channel('video_upload')->info('Validation başladı', array_merge($logCtx, [
-            'max_kb'       => $maxKb,
-            'file_size'    => $request->hasFile('video') ? $request->file('video')->getSize() : null,
-            'file_error'   => $request->hasFile('video') ? $request->file('video')->getError() : null,
-            'mime_type'    => $request->input('mime_type'),
+        Log::info('UPLOAD_LOG: Validation başladı', array_merge($logCtx, [
+            'max_kb'     => $maxKb,
+            'file_size'  => $request->hasFile('video') ? $request->file('video')->getSize() : null,
+            'file_error' => $request->hasFile('video') ? $request->file('video')->getError() : null,
+            'mime_type'  => $request->input('mime_type'),
         ]));
 
         try {
@@ -80,7 +80,7 @@ class RecordController extends Controller
                 'mime_type' => ['required', 'string'],
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::channel('video_upload')->error('Validation xətası', array_merge($logCtx, [
+            Log::error('UPLOAD_LOG: Validation xətası', array_merge($logCtx, [
                 'errors' => $e->errors(),
             ]));
             throw $e;
@@ -92,7 +92,7 @@ class RecordController extends Controller
         $filename = $application->id . '_' . now()->format('His') . '.' . $ext;
         $path = $dir . '/' . $filename;
 
-        Log::channel('video_upload')->info('Saxlanılır', array_merge($logCtx, [
+        Log::info('UPLOAD_LOG: Saxlanılır', array_merge($logCtx, [
             'disk' => $disk,
             'path' => $path,
             'size' => $request->file('video')->getSize(),
@@ -101,7 +101,7 @@ class RecordController extends Controller
         try {
             Storage::disk($disk)->putFileAs($dir, $request->file('video'), $filename);
         } catch (\Throwable $e) {
-            Log::channel('video_upload')->error('Storage xətası', array_merge($logCtx, [
+            Log::error('UPLOAD_LOG: Storage xətası', array_merge($logCtx, [
                 'error' => $e->getMessage(),
             ]));
             return response()->json(['success' => false, 'message' => 'Fayl saxlanılmadı: ' . $e->getMessage()], 500);
@@ -117,9 +117,7 @@ class RecordController extends Controller
 
         CompressVideo::dispatch($application);
 
-        Log::channel('video_upload')->info('Upload uğurlu', array_merge($logCtx, [
-            'path' => $path,
-        ]));
+        Log::info('UPLOAD_LOG: Uğurlu', array_merge($logCtx, ['path' => $path]));
 
         return response()->json([
             'success'  => true,

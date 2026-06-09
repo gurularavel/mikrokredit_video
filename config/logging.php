@@ -127,6 +127,14 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'video_upload' => [
+            'driver' => 'daily',
+            'path'   => storage_path('logs/video_upload.log'),
+            'level'  => 'debug',
+            'days'   => 14,
+            'replace_placeholders' => true,
+        ],
+
     ],
 
 ];

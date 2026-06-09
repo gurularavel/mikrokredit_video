@@ -121,6 +121,14 @@
 
         try {
             const response = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+            if (!response.ok) {
+                const text = await response.text().catch(() => '');
+                uploadOverlay.style.display = 'none';
+                statusMsg.textContent = 'Server xətası: HTTP ' + response.status + (text ? ' – ' + text.substring(0, 120) : '');
+                confirmBtn.disabled   = false;
+                rerecordBtn.disabled  = false;
+                return;
+            }
             const data = await response.json();
             if (data.success) {
                 stopStream();
@@ -133,7 +141,7 @@
             }
         } catch (err) {
             uploadOverlay.style.display = 'none';
-            statusMsg.textContent = 'Şəbəkə xətası: ' + err.message;
+            statusMsg.textContent = 'Şəbəkə xətası: ' + err.message + ' (fayl: ' + Math.round(recordedBlob.size / 1024) + ' KB)';
             confirmBtn.disabled   = false;
             rerecordBtn.disabled  = false;
         }

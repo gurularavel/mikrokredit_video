@@ -1,1 +1,26 @@
+name: Deploy VR Prod
 
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, prod, vr]
+
+    steps:
+      - name: Deploy on prod server
+        run: |
+          cd /record/video-record/current
+
+          git pull origin main
+
+          composer install --no-dev --optimize-autoloader
+
+          npm install
+          npm run build
+
+          php artisan migrate --force
+          php artisan optimize:clear
+          php artisan optimize

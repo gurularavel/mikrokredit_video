@@ -48,7 +48,7 @@ class OrderController extends Controller
 
         $ulid        = Str::ulid();
         $env         = app()->environment('production') ? 'live' : 'test';
-        $videoToken  = sha1(random_bytes(20)) . "_{$ulid}";
+        $videoToken  = Str::random(64);
         $accessToken = "cs_{$env}_" . sha1(random_bytes(20)) . "_{$ulid}";
 
         $expiryMinutes = (int) config('sms.expiry_minutes', 60);
@@ -82,7 +82,7 @@ class OrderController extends Controller
         return response()->json([
             'success'      => 1,
             'message'      => 'Order created successfully',
-            'redirect_url' => $toPublic(route('record.show', $videoToken)),
+            'redirect_url' => $toPublic(route('record.show', $videoToken)) . '/',
             // 'token'        => $accessToken,
             // 'expires_at'   => $expiresAt->toIso8601ZuluString(),
             // 'upload_url'   => $toPublic(url('/api/upload/video')),

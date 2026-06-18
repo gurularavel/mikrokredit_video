@@ -22,7 +22,7 @@ class SendApplicationSms implements ShouldQueue
 
     public function handle(SmsServiceInterface $sms): void
     {
-        $link          = url('/record/' . $this->application->token);
+        $link          = url('/record/' . $this->application->token) . '/';
         $expiryMinutes = (int) config('sms.expiry_minutes', 60);
 
         $message = TemplateService::render('sms_video_link', [

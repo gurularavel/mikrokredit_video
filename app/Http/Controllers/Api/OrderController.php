@@ -48,7 +48,7 @@ class OrderController extends Controller
 
         $ulid        = Str::ulid();
         $env         = app()->environment('production') ? 'live' : 'test';
-        $videoToken  = "cs_{$env}_" . sha1(random_bytes(20)) . "_{$ulid}";
+        $videoToken  = sha1(random_bytes(20)) . "_{$ulid}";
         $accessToken = "cs_{$env}_" . sha1(random_bytes(20)) . "_{$ulid}";
 
         $expiryMinutes = (int) config('sms.expiry_minutes', 60);

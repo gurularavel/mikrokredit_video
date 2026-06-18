@@ -1,4 +1,4 @@
-name: Deploy test-vr
+name: Deploy VR Prod
 
 on:
   push:
@@ -7,34 +7,25 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: [self-hosted, prod, vr]
 
     steps:
-      - name: Deploy Laravel app
+      - name: Deploy on prod server
         run: |
           set -e
 
-          cd /video/videorec20
+          APP_DIR="/record/video-record/current"
 
-          git fetch origin main
-          git reset --hard origin/main
-          git clean -fd
+          cd "$APP_DIR"
 
-          composer install --no-dev --optimize-autoloader
+          git pull origin main
 
-          npm install
+          composer install --no-dev --optimize-autoloader --no-interaction
+
+          npm ci
           npm run build
 
           php artisan migrate --force
 
-          php artisan config:clear
-          php artisan cache:clear
-          php artisan route:clear
-          php artisan view:clear
-
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-
-          sudo systemctl reload php8.3-fpm
-          sudo systemctl reload nginx
+          php artisan optimize:clear
+          php artisan optimize

@@ -12,6 +12,7 @@ class ApplicationController extends Controller
     public function index()
     {
         return view('public.index');
+
     }
 
     public function store(StoreApplicationRequest $request)

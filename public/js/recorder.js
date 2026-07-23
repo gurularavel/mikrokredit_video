@@ -121,21 +121,36 @@
 
         try {
             const response = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+            const data = await response.json().catch(() => null);
+
             if (!response.ok) {
-                const text = await response.text().catch(() => '');
                 uploadOverlay.style.display = 'none';
-                statusMsg.textContent = 'Server xətası: HTTP ' + response.status + (text ? ' – ' + text.substring(0, 120) : '');
+
+                // Qalıcı token xətaları (link tapılmadı / vaxtı bitib / istifadə olunub):
+                // retry heç vaxt uğurlu olmayacaq — buna görə AVTOMATİK təkrar YOX,
+                // düymələri də aktivləşdirmirik ki, əl ilə də təkrar göndərilməsin.
+                if (data && data.retryable === false) {
+                    statusMsg.textContent = data.message || 'Link etibarsızdır. Yeni link tələb edin.';
+                    confirmBtn.disabled  = true;
+                    rerecordBtn.disabled = true;
+                    return;
+                }
+
+                // Digər xətalar (server/validation/şəbəkə) — istifadəçi yenidən çəkə/göndərə bilər.
+                statusMsg.textContent = (data && data.message)
+                    ? data.message
+                    : ('Server xətası: HTTP ' + response.status);
                 confirmBtn.disabled   = false;
                 rerecordBtn.disabled  = false;
                 return;
             }
-            const data = await response.json();
-            if (data.success) {
+
+            if (data && data.success) {
                 stopStream();
                 window.location.href = data.redirect;
             } else {
                 uploadOverlay.style.display = 'none';
-                statusMsg.textContent = data.message || 'Xəta baş verdi. Yenidən cəhd edin.';
+                statusMsg.textContent = (data && data.message) || 'Xəta baş verdi. Yenidən cəhd edin.';
                 confirmBtn.disabled   = false;
                 rerecordBtn.disabled  = false;
             }

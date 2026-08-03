@@ -93,7 +93,7 @@ class OrderController extends Controller
     public function status(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'app_ids'   => 'required|array|min:1|max:500',
+            'app_ids'   => 'required|array|min:1|max:5000',
             'app_ids.*' => 'required|string|max:100',
         ]);
 

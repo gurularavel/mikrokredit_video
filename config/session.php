@@ -169,7 +169,9 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    // Browsers reject "SameSite=None" cookies that are not also "Secure", so
+    // when the session is configured for cross-site use we force the flag on.
+    'secure' => env('SESSION_SECURE_COOKIE', env('SESSION_SAME_SITE', 'lax') === 'none'),
 
     /*
     |--------------------------------------------------------------------------

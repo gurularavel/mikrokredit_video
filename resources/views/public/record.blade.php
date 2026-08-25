@@ -1,6 +1,8 @@
 @extends('layouts.public')
 
 @section('title', 'Video Müraciət')
+@section('body_class', 'is-record')
+@section('masthead_note', 'Qeydiyyat aktiv')
 
 @push('head')
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -11,15 +13,27 @@
      data-duration="{{ $duration }}"
      data-upload-url="{{ route('record.upload', $application->token) }}">
 
-    @if($application->amount)
-    <div class="amount-badge">
-        <span class="amount-label">Kredit məbləği:</span>
-        <span class="amount-value">{{ number_format($application->amount, fmod($application->amount, 1) == 0 ? 0 : 2, '.', ' ') }} AZN</span>
+    <div class="record-strip">
+        <span class="eyebrow">Video təsdiq</span>
+        @if($application->amount)
+        <span class="amount-badge">
+            <span class="amount-label">Məbləğ</span>
+            <span class="amount-value">{{ $application->formattedAmount() }}</span>
+        </span>
+        @endif
     </div>
-    @endif
 
     @php
         $warningText = \App\Services\TemplateService::render('page_record_warning', [], 'Video çəkilişi zamanı yanınızda kimsənin olmadığından əmin olun.');
+
+        $vars       = $application->templateVars();
+        $scriptText = \App\Services\TemplateService::renderFirst(
+            $application->recordScriptKeys(),
+            $vars,
+            'Mən, ' . $vars['ad_soyad'] . ', ' . ($vars['mebleg'] ? $vars['mebleg'] . ' məbləğində ' : '')
+                . 'kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: ' . $vars['telefon']
+                . '. Bu müraciəti şüurlu şəkildə edirəm.'
+        );
     @endphp
     @if($warningText)
     <div class="record-warning">
@@ -40,45 +54,45 @@
             <span class="timer-number" id="timer-number">{{ $duration }}</span>
         </div>
 
-        <!-- Script overlay -->
+        <!-- Teleprompter -->
         <div class="script-overlay" id="teleprompter">
             <div class="teleprompter-inner" id="teleprompter-inner">
-                <p>{!! nl2br(e(\App\Services\TemplateService::render('page_record_script', [
-                    'ad'       => $application->name,
-                    'soyad'    => $application->surname,
-                    'ad_soyad' => $application->name . ' ' . $application->surname,
-                    'telefon'  => $application->phone,
-                    'mebleg'   => $application->amount ? number_format($application->amount, fmod($application->amount, 1) == 0 ? 0 : 2, '.', ' ') . ' AZN' : '',
-                ], 'Mən, ' . $application->name . ' ' . $application->surname . ', ' . ($application->amount ? number_format($application->amount, fmod($application->amount, 1) == 0 ? 0 : 2, '.', ' ') . ' AZN məbləğində ' : '') . 'kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: ' . $application->phone . '. Bu müraciəti şüurlu şəkildə edirəm.'))) !!}</p>
+                <p>{!! nl2br(e($scriptText)) !!}</p>
             </div>
         </div>
 
         <!-- Early action buttons — overlay, visible at 10s remaining -->
         <div class="video-actions-overlay" id="early-actions" style="display:none">
-            <button class="btn btn-secondary" id="early-rerecord-btn">Yenidən çək</button>
-            <button class="btn btn-primary" id="early-confirm-btn">Göndər</button>
+            <button class="btn btn-ghost-light" id="early-rerecord-btn">Yenidən çək</button>
+            <button class="btn btn-copper" id="early-confirm-btn">Göndər</button>
         </div>
 
         <!-- Start overlay -->
         <div id="start-screen" class="start-overlay">
-            <button id="start-btn" class="btn btn-primary btn-start">&#9654; Başla</button>
+            <div class="start-overlay-inner">
+                <span class="start-hint">Hazır olduqda başlayın</span>
+                <button id="start-btn" class="btn btn-start">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+                    Başla
+                </button>
+                <span class="start-hint" style="letter-spacing:.12em;opacity:.72">{{ $duration }} saniyə · bir dəfəlik</span>
+            </div>
         </div>
     </div>
 
     <!-- Preview after recording -->
     <div class="preview-container" id="preview-container" style="display:none">
         <video id="preview-video" controls playsinline></video>
-        <!-- Preview actions overlay -->
         <div class="video-actions-overlay">
-            <button class="btn btn-secondary" id="rerecord-btn">Yenidən çək</button>
-            <button class="btn btn-primary" id="confirm-btn">Göndər</button>
+            <button class="btn btn-ghost-light" id="rerecord-btn">Yenidən çək</button>
+            <button class="btn btn-copper" id="confirm-btn">Göndər</button>
         </div>
     </div>
 
     <!-- Upload progress -->
     <div class="upload-overlay" id="upload-overlay" style="display:none">
         <div class="spinner"></div>
-        <p>Video yüklənir...</p>
+        <p>Video yüklənir</p>
     </div>
 
     <div class="status-msg" id="status-msg"></div>
@@ -91,139 +105,6 @@
     @endif
 </div>
 @endsection
-
-@push('head')
-<style>
-/* Full-height flex chain — only record page has camera-container/record-page */
-html, body { height: 100%; }
-.public-layout { display: flex; flex-direction: column; }
-.public-layout .container {
-    padding: 10px 12px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-}
-.record-page {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-}
-#camera-container {
-    flex: 1;
-    min-height: 0;
-    aspect-ratio: unset;
-    max-height: none;
-}
-#preview-container {
-    flex: 1;
-    min-height: 0;
-}
-
-.record-admin-notes {
-    margin-top: 8px;
-    padding: 10px 14px;
-    background: var(--color-card, #fff);
-    border: 1.5px solid var(--color-border, #e2e8f0);
-    border-radius: 8px;
-    font-size: .88rem;
-    line-height: 1.6;
-    color: var(--color-text, #1e293b);
-}
-
-.amount-badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--color-card, #fff);
-    border: 1.5px solid var(--color-border, #e2e8f0);
-    border-radius: 8px;
-    padding: 6px 12px;
-    margin-bottom: 6px;
-    font-size: .9rem;
-}
-.amount-label { color: var(--color-text-secondary, #64748b); font-weight: 500; }
-.amount-value { font-weight: 700; color: var(--color-primary, #2563eb); }
-
-.record-warning {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    background: #fefce8;
-    border: 1.5px solid #fde047;
-    border-radius: 8px;
-    padding: 6px 12px;
-    margin-bottom: 6px;
-    color: #854d0e;
-    font-size: .85rem;
-    line-height: 1.45;
-}
-.record-warning svg {
-    flex-shrink: 0;
-    width: 17px; height: 17px;
-    margin-top: 1px;
-    stroke: #ca8a04;
-}
-
-/* Script overlay */
-.script-overlay {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    background: rgba(0, 0, 0, 0.62);
-    z-index: 5;
-    padding: 14px 16px 20px;
-}
-.teleprompter-inner {
-    font-size: 1.6rem;
-    line-height: 1.7;
-    color: #fff;
-    font-weight: 600;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-}
-
-/* Shared overlay for action buttons (early + preview) */
-.video-actions-overlay {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    padding: 16px 16px 22px;
-    background: rgba(0, 0, 0, 0.72);
-    z-index: 20;
-    animation: fadeInUp .35s ease;
-}
-
-/* Early buttons pinned to the TOP */
-#early-actions {
-    top: 0;
-    bottom: auto;
-    padding: 18px 16px 14px;
-    animation-name: fadeInDown;
-}
-
-@keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Start button overlay */
-.start-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-}
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-</style>
-@endpush
 
 @push('scripts')
 <script src="{{ asset('js/recorder.js') }}?v={{ filemtime(public_path('js/recorder.js')) }}"></script>

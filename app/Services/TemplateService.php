@@ -29,6 +29,25 @@ class TemplateService
     }
 
     /**
+     * Render the first key that resolves to a non-empty template.
+     * Lets a specific variant (e.g. page_record_script_2) fall back to the base key.
+     *
+     * @param  list<string>  $keys
+     */
+    public static function renderFirst(array $keys, array $vars = [], string $default = ''): string
+    {
+        foreach ($keys as $key) {
+            $rendered = trim(self::render($key, $vars));
+
+            if ($rendered !== '') {
+                return $rendered;
+            }
+        }
+
+        return $default;
+    }
+
+    /**
      * Bust the cache for a given key after update.
      */
     public static function forget(string $key): void

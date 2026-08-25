@@ -4,12 +4,12 @@
 
 @section('content')
 <div class="page-header">
-    <h2>Mesaj Şablonları</h2>
+    <h2><span class="eyebrow">Konfiqurasiya</span>Mesaj Şablonları</h2>
 </div>
 
-<div class="tabs-wrapper">
-    <button class="tab-btn active" data-tab="sms">SMS Şablonları</button>
-    <button class="tab-btn" data-tab="page">Səhifə Mesajları</button>
+<div class="tabs-wrapper" role="tablist">
+    <button class="tab-btn active" data-tab="sms" role="tab" aria-selected="true">SMS şablonları</button>
+    <button class="tab-btn" data-tab="page" role="tab" aria-selected="false">Səhifə mesajları</button>
 </div>
 
 {{-- SMS Templates --}}
@@ -18,9 +18,9 @@
     <div class="detail-card template-card">
         <div class="template-header">
             <h3>{{ $tpl->label }}</h3>
-            @if($tpl->placeholders)
+            @if($tpl->placeholders && count($tpl->placeholders))
             <div class="placeholder-list">
-                <span class="placeholder-hint">İstifadə edilə bilən dəyişənlər:</span>
+                <span class="placeholder-hint">Dəyişənlər</span>
                 @foreach($tpl->placeholders as $ph)
                     <code class="placeholder-tag" title="Kopyala" onclick="copyPlaceholder(this)">{{ $ph }}</code>
                 @endforeach
@@ -47,7 +47,7 @@
             <h3>{{ $tpl->label }}</h3>
             @if($tpl->placeholders && count($tpl->placeholders))
             <div class="placeholder-list">
-                <span class="placeholder-hint">İstifadə edilə bilən dəyişənlər:</span>
+                <span class="placeholder-hint">Dəyişənlər</span>
                 @foreach($tpl->placeholders as $ph)
                     <code class="placeholder-tag" title="Kopyala" onclick="copyPlaceholder(this)">{{ $ph }}</code>
                 @endforeach
@@ -66,52 +66,27 @@
     @endforeach
 </div>
 
-<style>
-.tabs-wrapper { display:flex; gap:4px; margin-bottom:20px; }
-.tab-btn {
-    padding:8px 24px; border:1.5px solid var(--color-border); background:var(--color-card);
-    border-radius:8px 8px 0 0; font-size:.875rem; font-weight:600;
-    cursor:pointer; color:var(--color-text-secondary); transition:all .15s;
-    font-family:var(--font);
-}
-.tab-btn.active { background:var(--color-primary); color:#fff; border-color:var(--color-primary); box-shadow:0 2px 8px rgba(21,96,189,.3); }
-.template-card { margin-bottom:16px; }
-.template-header { margin-bottom:12px; }
-.template-header h3 { font-size:.9375rem; font-weight:600; color:var(--color-text); margin-bottom:6px; }
-.placeholder-list { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
-.placeholder-hint { font-size:.75rem; color:var(--color-text-muted); font-weight:500; text-transform:uppercase; letter-spacing:.04em; }
-.placeholder-tag {
-    background:var(--color-primary-ultra); color:var(--color-primary); border:1px solid var(--color-primary-light);
-    border-radius:4px; padding:2px 8px; font-size:.79rem; font-weight:600;
-    cursor:pointer; transition:all .15s; font-family:inherit;
-}
-.placeholder-tag:hover { background:var(--color-primary-light); border-color:var(--color-primary); }
-.template-textarea {
-    width:100%; padding:10px 13px;
-    border:1.5px solid var(--color-border); border-radius:8px;
-    font-size:.9375rem; font-family:var(--font);
-    resize:vertical; transition:border-color .2s, box-shadow .2s; line-height:1.6;
-    background:var(--color-card); color:var(--color-text);
-}
-.template-textarea:focus { outline:none; border-color:var(--color-primary); box-shadow:0 0 0 3px rgba(21,96,189,.12); }
-</style>
-
+@push('scripts')
 <script>
-document.querySelectorAll('.tab-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-        document.querySelectorAll('.tab-panel').forEach(function(p) { p.style.display = 'none'; });
+document.querySelectorAll('.tab-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        document.querySelectorAll('.tab-btn').forEach(function (b) {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+        });
+        document.querySelectorAll('.tab-panel').forEach(function (p) { p.style.display = 'none'; });
         btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
         document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
     });
 });
 
 function copyPlaceholder(el) {
-    navigator.clipboard.writeText(el.textContent.trim()).then(function() {
-        var orig = el.style.background;
-        el.style.background = '#c7d2fe';
-        setTimeout(function() { el.style.background = orig; }, 600);
+    window.copyText(el.textContent.trim()).then(function () {
+        el.classList.add('copied');
+        setTimeout(function () { el.classList.remove('copied'); }, 900);
     });
 }
 </script>
+@endpush
 @endsection

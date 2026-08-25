@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', \App\Services\SettingService::get('og_title', 'Video Müraciət'))
+@section('masthead_note', 'Arxiv qeydi')
 
 @push('head')
 @php
@@ -28,58 +29,33 @@
 @endpush
 
 @section('content')
-<div class="video-show-page">
-    <div class="video-show-header">
-        <h1>Video Müraciət</h1>
-        <p>{{ $application->name }} {{ $application->surname }}</p>
+<div class="reel">
+    <header class="reel-head reveal reveal-1">
+        <div>
+            <span class="eyebrow">Video müraciət</span>
+            <h1>{{ $application->name }} {{ $application->surname }}</h1>
+        </div>
+        <div class="who">
+            @if($application->app_id)
+            <div>ID {{ $application->app_id }}</div>
+            @endif
+            <div>{{ ($application->video_recorded_at ?? $application->created_at)->format('d.m.Y · H:i') }}</div>
+        </div>
+    </header>
+
+    <div class="reel-frame reveal reveal-2">
+        <video controls playsinline preload="metadata">
+            <source src="{{ $application->publicStreamUrl() }}" type="video/webm">
+            <source src="{{ $application->publicStreamUrl() }}" type="video/mp4">
+            Brauzeriniz video oynatmağı dəstəkləmir.
+        </video>
     </div>
 
-    <video controls playsinline class="video-show-player">
-        <source src="{{ $application->publicStreamUrl() }}" type="video/webm">
-        <source src="{{ $application->publicStreamUrl() }}" type="video/mp4">
-    </video>
-
-    @if($application->amount)
-    <div class="video-show-meta">
-        <span>Kredit məbləği: <strong>{{ number_format($application->amount, 2, '.', ' ') }} AZN</strong></span>
+    <div class="reel-meta reveal reveal-3">
+        @if($application->amount)
+        <span>Kredit məbləği <strong>{{ number_format($application->amount, 2, '.', ' ') }} AZN</strong></span>
+        @endif
+        <span>Telefon <strong>{{ $application->phone }}</strong></span>
     </div>
-    @endif
 </div>
 @endsection
-
-@push('head')
-<style>
-.video-show-page {
-    max-width: 680px;
-    margin: 0 auto;
-}
-.video-show-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-.video-show-header h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-}
-.video-show-header p {
-    color: var(--color-text-secondary, #64748b);
-    margin-top: 4px;
-}
-.video-show-player {
-    width: 100%;
-    border-radius: 12px;
-    background: #0B1629;
-    box-shadow: 0 8px 32px rgba(11,22,41,.2);
-    display: block;
-}
-.video-show-meta {
-    margin-top: 14px;
-    text-align: center;
-    color: var(--color-text-secondary, #64748b);
-    font-size: .9375rem;
-}
-.video-show-meta strong {
-    color: var(--color-primary, #2563eb);
-}
-</style>
-@endpush

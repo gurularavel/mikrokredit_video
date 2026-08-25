@@ -44,6 +44,7 @@ class ApplicationController extends Controller
             'surname' => ['required', 'string', 'max:100'],
             'phone'   => ['required', 'string', 'regex:/^\+994[0-9]{9}$/'],
             'amount'  => ['nullable', 'numeric', 'min:0'],
+            'm_type'  => ['nullable', 'integer', 'in:' . implode(',', array_keys(Application::M_TYPES))],
         ], [
             'name.required'    => 'Ad daxil edin.',
             'surname.required' => 'Soyad daxil edin.',
@@ -62,6 +63,7 @@ class ApplicationController extends Controller
             'surname'          => $validated['surname'],
             'phone'            => $validated['phone'],
             'amount'           => $validated['amount'] ?? null,
+            'm_type'           => (int) ($validated['m_type'] ?? 1),
             'token'            => $token,
             'access_token'     => $accessToken,
             'token_expires_at' => now()->addMinutes($expiryMinutes),

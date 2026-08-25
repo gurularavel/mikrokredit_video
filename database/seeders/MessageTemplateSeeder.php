@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\MessageTemplate;
+use App\Services\TemplateService;
 use Illuminate\Database\Seeder;
 
 class MessageTemplateSeeder extends Seeder
@@ -113,13 +114,22 @@ class MessageTemplateSeeder extends Seeder
                 'content'      => 'Belə bir link mövcud deyil. Zəhmət olmasa linki yoxlayın.',
             ],
 
-            // ── Page: Video çəkiliş skripti ───────────────────────────────
+            // ── Page: Video çəkiliş skriptləri ────────────────────────────
+            // Hansının göstərilməsi `applications.m_type` sütunundan asılıdır
+            // (API-də `m_type` sahəsi): 1 → birinci, 2 → ikinci.
             [
                 'key'          => 'page_record_script',
-                'label'        => 'Video çəkiliş — oxunacaq mətn',
+                'label'        => 'Video çəkiliş — oxunacaq mətn (Tip 1)',
                 'group'        => 'page',
                 'placeholders' => ['{ad}', '{soyad}', '{ad_soyad}', '{telefon}', '{mebleg}'],
                 'content'      => 'Mən, {ad_soyad}, {mebleg} məbləğində kredit müraciəti etdiyimi təsdiq edirəm. Telefon nömrəm: {telefon}. Bu müraciəti şüurlu şəkildə edirəm.',
+            ],
+            [
+                'key'          => 'page_record_script_2',
+                'label'        => 'Video çəkiliş — oxunacaq mətn (Tip 2)',
+                'group'        => 'page',
+                'placeholders' => ['{ad}', '{soyad}', '{ad_soyad}', '{telefon}', '{mebleg}'],
+                'content'      => 'Mən, {ad_soyad}, telefon nömrəm {telefon}, {mebleg} məbləğində kredit müqaviləsinin şərtləri ilə tanış olduğumu və razılaşdığımı təsdiq edirəm.',
             ],
 
             // ── Page: Video çəkiliş xəbərdarlığı ─────────────────────────
@@ -133,7 +143,23 @@ class MessageTemplateSeeder extends Seeder
         ];
 
         foreach ($templates as $data) {
-            MessageTemplate::updateOrCreate(['key' => $data['key']], $data);
+            $existing = MessageTemplate::where('key', $data['key'])->first();
+
+            // Mövcud şablonun mətni adminin redaktəsi ola bilər — onu əzmirik;
+            // yalnız etiket və dəyişən siyahısını sinxronlaşdırırıq.
+            if ($existing) {
+                $existing->update([
+                    'label'        => $data['label'],
+                    'group'        => $data['group'],
+                    'placeholders' => $data['placeholders'],
+                ]);
+
+                TemplateService::forget($data['key']);
+
+                continue;
+            }
+
+            MessageTemplate::create($data);
         }
     }
 }

@@ -38,9 +38,13 @@ class OrderController extends Controller
             'redirect_url' => 'nullable|url',
             'name'         => 'required|string|max:100',
             'lang'         => 'nullable|string|max:10',
+            // Video çəkiliş mətninin tipi: 1 → "Tip 1" şablonu, 2 → "Tip 2" şablonu.
+            'm_type'       => 'nullable|integer|in:' . implode(',', array_keys(Application::M_TYPES)),
             'city'         => 'nullable|string|max:100',
             'address'      => 'nullable|string|max:255',
             'salary'       => 'nullable|numeric|min:0',
+        ], [
+            'm_type.in' => 'm_type yalnız ' . implode(' və ya ', array_keys(Application::M_TYPES)) . ' ola bilər.',
         ]);
 
         /** @var Merchant $merchant */
@@ -64,6 +68,7 @@ class OrderController extends Controller
             'webhook_url'          => $validated['webhook_url'] ?? null,
             'merchant_redirect_url' => $validated['redirect_url'] ?? null,
             'lang'                 => $validated['lang'] ?? null,
+            'm_type'               => (int) ($validated['m_type'] ?? 1),
             'city'                 => $validated['city'] ?? null,
             'address'              => $validated['address'] ?? null,
             'salary'               => $validated['salary'] ?? null,

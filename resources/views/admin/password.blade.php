@@ -4,57 +4,124 @@
 
 @section('content')
 <div class="page-header">
-    <h2>Şifrə dəyiş</h2>
+    <h2><span class="eyebrow">Hesab</span>Şifrə dəyiş</h2>
 </div>
 
-<div class="detail-card" style="max-width:480px">
-    @if($errors->any())
-        <div class="alert alert-error">{{ $errors->first() }}</div>
-    @endif
+<div class="pw-grid">
+    <div class="detail-card">
+        <h3>Yeni giriş məlumatları</h3>
 
-    <form method="POST" action="{{ route('admin.password.update') }}">
-        @csrf
-        <div class="form-group">
-            <label>Cari şifrə</label>
-            <div class="pw-wrap">
-                <input type="password" id="pw_current" name="current_password" required autofocus>
-                <button type="button" class="pw-eye" data-target="pw_current" title="Göstər/gizlət">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Yeni şifrə</label>
-            <div class="pw-wrap">
-                <input type="password" id="pw_new" name="password" required minlength="6">
-                <button type="button" class="pw-eye" data-target="pw_new" title="Göstər/gizlət">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Yeni şifrəni təkrarla</label>
-            <div class="pw-wrap">
-                <input type="password" id="pw_confirm" name="password_confirmation" required minlength="6">
-                <button type="button" class="pw-eye" data-target="pw_confirm" title="Göstər/gizlət">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Yadda saxla</button>
-    </form>
+        @if($errors->any())
+            <div class="alert alert-error">{{ $errors->first() }}</div>
+        @endif
 
+        <form method="POST" action="{{ route('admin.password.update') }}" id="pwForm">
+            @csrf
+
+            <div class="form-group">
+                <label for="pw_current">Cari şifrə</label>
+                <div class="pw-wrap">
+                    <input type="password" id="pw_current" name="current_password" required autofocus autocomplete="current-password">
+                    <button type="button" class="pw-eye" data-pw-toggle="pw_current" title="Göstər/gizlət" aria-label="Göstər/gizlət"></button>
+                </div>
+            </div>
+
+            <div class="auth-rule" aria-hidden="true"></div>
+
+            <div class="form-group">
+                <label for="pw_new">Yeni şifrə</label>
+                <div class="pw-wrap">
+                    <input type="password" id="pw_new" name="password" required minlength="6" autocomplete="new-password">
+                    <button type="button" class="pw-eye" data-pw-toggle="pw_new" title="Göstər/gizlət" aria-label="Göstər/gizlət"></button>
+                </div>
+                <div class="pw-meter" id="pwMeter" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <span class="field-hint" id="pwMeterLabel">Ən azı 6 simvol.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="pw_confirm">Yeni şifrəni təkrarla</label>
+                <div class="pw-wrap">
+                    <input type="password" id="pw_confirm" name="password_confirmation" required minlength="6" autocomplete="new-password">
+                    <button type="button" class="pw-eye" data-pw-toggle="pw_confirm" title="Göstər/gizlət" aria-label="Göstər/gizlət"></button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px">Yadda saxla</button>
+        </form>
+    </div>
+
+    <div class="detail-card pw-aside">
+        <h3>Tələblər</h3>
+
+        <ul class="checklist" id="pwChecks">
+            <li data-check="len">
+                <span class="check-mark" aria-hidden="true"></span>
+                <span>Ən azı 6 simvol</span>
+            </li>
+            <li data-check="mix">
+                <span class="check-mark" aria-hidden="true"></span>
+                <span>Hərf və rəqəm birlikdə</span>
+            </li>
+            <li data-check="case">
+                <span class="check-mark" aria-hidden="true"></span>
+                <span>Böyük və kiçik hərf</span>
+            </li>
+            <li data-check="match">
+                <span class="check-mark" aria-hidden="true"></span>
+                <span>Təkrar şifrə uyğundur</span>
+            </li>
+        </ul>
+
+        <div class="auth-rule" aria-hidden="true"></div>
+
+        <p class="settings-hint" style="margin:0">
+            Şifrəni dəyişdikdən sonra cari sessiya davam edir, lakin digər cihazlarda yenidən giriş tələb oluna bilər.
+            Şifrənizi heç kimlə paylaşmayın.
+        </p>
+    </div>
+</div>
+
+@push('scripts')
 <script>
-document.querySelectorAll('.pw-eye').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var input = document.getElementById(this.dataset.target);
-        var show = input.type === 'password';
-        input.type = show ? 'text' : 'password';
-        this.innerHTML = show
-            ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
-            : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
-    });
-});
+(function () {
+    var pw      = document.getElementById('pw_new');
+    var confirm = document.getElementById('pw_confirm');
+    var meter   = document.getElementById('pwMeter');
+    var label   = document.getElementById('pwMeterLabel');
+    var checks  = document.getElementById('pwChecks');
+    if (!pw || !confirm) return;
+
+    var LEVELS = ['Çox zəif', 'Zəif', 'Orta', 'Güclü'];
+
+    function evaluate() {
+        var v = pw.value;
+        var state = {
+            len:   v.length >= 6,
+            mix:   /[A-Za-zÇÖĞİŞÜƏçöğışüə]/.test(v) && /\d/.test(v),
+            case:  /[a-zçöğışüə]/.test(v) && /[A-ZÇÖĞİŞÜƏ]/.test(v),
+            match: v.length > 0 && v === confirm.value
+        };
+
+        checks.querySelectorAll('[data-check]').forEach(function (li) {
+            li.classList.toggle('ok', !!state[li.dataset.check]);
+        });
+
+        var score = 0;
+        if (state.len)  score++;
+        if (state.mix)  score++;
+        if (state.case) score++;
+        if (v.length >= 10) score++;
+
+        meter.dataset.score = v.length ? score : 0;
+        label.textContent = v.length ? 'Güc: ' + LEVELS[Math.max(score - 1, 0)] : 'Ən azı 6 simvol.';
+    }
+
+    pw.addEventListener('input', evaluate);
+    confirm.addEventListener('input', evaluate);
+    evaluate();
+})();
 </script>
-</div>
+@endpush
 @endsection

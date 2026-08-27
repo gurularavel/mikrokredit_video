@@ -7,6 +7,7 @@ use App\Services\Sms\LSimSmsService;
 use App\Services\Sms\SmsAzService;
 use App\Services\Sms\SmsServiceInterface;
 use App\Services\Sms\TwilioSmsService;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -33,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        if (config('app.url')) {
+            URL::forceRootUrl(config('app.url'));
+        }
     }
 }

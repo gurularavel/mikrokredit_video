@@ -87,7 +87,7 @@ class OrderController extends Controller
         return response()->json([
             'success'      => 1,
             'message'      => 'Order created successfully',
-            'redirect_url' => $toPublic(route('record.show', $videoToken)) . '/',
+            'redirect_url' => $toPublic(route('record.show', $videoToken)) ,
             // 'token'        => $accessToken,
             // 'expires_at'   => $expiresAt->toIso8601ZuluString(),
             // 'upload_url'   => $toPublic(url('/api/upload/video')),

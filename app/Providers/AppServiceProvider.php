@@ -7,6 +7,7 @@ use App\Services\Sms\LSimSmsService;
 use App\Services\Sms\SmsAzService;
 use App\Services\Sms\SmsServiceInterface;
 use App\Services\Sms\TwilioSmsService;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -36,6 +37,10 @@ class AppServiceProvider extends ServiceProvider
     {
         if (config('app.url')) {
             URL::forceRootUrl(config('app.url'));
+
+            // Paginator öz kökünü xam request-dən götürür (proxy arxasında port itir);
+            // URL::current() isə forced root-u istifadə edir.
+            Paginator::currentPathResolver(fn () => URL::current());
         }
     }
 }

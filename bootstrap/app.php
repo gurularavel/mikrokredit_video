@@ -18,6 +18,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.auth'    => AdminAuthenticated::class,
             'merchant.auth' => MerchantBasicAuth::class,
         ]);
+
+        // Video upload iframe içindən (merchant səhifəsi) də çağırıla bilir.
+        // iOS Safari ITP cross-site iframe-də sessiya cookie-sini bloklayır —
+        // bu da CSRF token uyğunsuzluğu (419) deməkdir. Bu route onsuz da
+        // URL-dəki birdəfəlik token ilə qorunur, ona görə CSRF-dən çıxarılır.
+        $middleware->validateCsrfTokens(except: [
+            'record/*/upload',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Illuminate\Validation\ValidationException $e, $request) {

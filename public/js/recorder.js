@@ -4,7 +4,8 @@
 
     const DURATION   = parseInt(app.dataset.duration, 10) || 20;
     const UPLOAD_URL = app.dataset.uploadUrl;
-    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
+    const CSRF_META  = document.querySelector('meta[name="csrf-token"]');
+    const CSRF_TOKEN = CSRF_META ? CSRF_META.content : '';
     const EARLY_SHOW = 10; // saniyə qaldıqda düymələri göstər
 
     const liveVideo          = document.getElementById('live-video');
@@ -120,11 +121,28 @@
         formData.append('_token', CSRF_TOKEN);
 
         try {
-            const response = await fetch(UPLOAD_URL, { method: 'POST', body: formData });
+            const response = await fetch(UPLOAD_URL, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                },
+            });
             const data = await response.json().catch(() => null);
 
             if (!response.ok) {
                 uploadOverlay.style.display = 'none';
+
+                // 419 — sessiya/CSRF problemi (iframe içində cookie bloklana bilər).
+                if (response.status === 419) {
+                    statusMsg.textContent = 'Sessiya vaxtı bitdi. Səhifəni yeniləyib yenidən cəhd edin.';
+                    confirmBtn.disabled  = false;
+                    rerecordBtn.disabled = false;
+                    return;
+                }
 
                 // Qalıcı token xətaları (link tapılmadı / vaxtı bitib / istifadə olunub):
                 // retry heç vaxt uğurlu olmayacaq — buna görə AVTOMATİK təkrar YOX,
